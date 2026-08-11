@@ -1,10 +1,112 @@
 {
   "images": [
-    { "src": "/images/gallery/realizacja-01.svg", "alt": "Realizacja stolarska Stolkor 1" },
-    { "src": "/images/gallery/realizacja-02.svg", "alt": "Realizacja stolarska Stolkor 2" },
-    { "src": "/images/gallery/realizacja-03.svg", "alt": "Realizacja stolarska Stolkor 3" },
-    { "src": "/images/gallery/realizacja-04.svg", "alt": "Realizacja stolarska Stolkor 4" },
-    { "src": "/images/gallery/realizacja-05.svg", "alt": "Realizacja stolarska Stolkor 5" },
-    { "src": "/images/gallery/realizacja-06.svg", "alt": "Realizacja stolarska Stolkor 6" }
+    {
+      "src": "/images/gallery/realizacja-01.jpeg",
+      "alt": "Realizacja Stolkor 1"
+    },
+    {
+      "src": "/images/gallery/realizacja-02.jpeg",
+      "alt": "Realizacja Stolkor 2"
+    },
+    {
+      "src": "/images/gallery/realizacja-03.jpeg",
+      "alt": "Realizacja Stolkor 3"
+    },
+    {
+      "src": "/images/gallery/realizacja-04.jpeg",
+      "alt": "Realizacja Stolkor 4"
+    },
+    {
+      "src": "/images/gallery/realizacja-05.jpeg",
+      "alt": "Realizacja Stolkor 5"
+    },
+    {
+      "src": "/images/gallery/realizacja-06.jpeg",
+      "alt": "Realizacja Stolkor 6"
+    },
+    {
+      "src": "/images/gallery/realizacja-07.jpeg",
+      "alt": "Realizacja Stolkor 7"
+    },
+    {
+      "src": "/images/gallery/realizacja-08.jpeg",
+      "alt": "Realizacja Stolkor 8"
+    },
+    {
+      "src": "/images/gallery/realizacja-09.jpeg",
+      "alt": "Realizacja Stolkor 9"
+    },
+    {
+      "src": "/images/gallery/realizacja-10.jpeg",
+      "alt": "Realizacja Stolkor 10"
+    },
+    {
+      "src": "/images/gallery/realizacja-11.jpeg",
+      "alt": "Realizacja Stolkor 11"
+    },
+    {
+      "src": "/images/gallery/realizacja-12.jpeg",
+      "alt": "Realizacja Stolkor 12"
+    },
+    {
+      "src": "/images/gallery/realizacja-13.jpeg",
+      "alt": "Realizacja Stolkor 13"
+    },
+    {
+      "src": "/images/gallery/realizacja-14.jpeg",
+      "alt": "Realizacja Stolkor 14"
+    },
+    {
+      "src": "/images/gallery/realizacja-15.jpeg",
+      "alt": "Realizacja Stolkor 15"
+    },
+    {
+      "src": "/images/gallery/realizacja-16.jpeg",
+      "alt": "Realizacja Stolkor 16"
+    },
+    {
+      "src": "/images/gallery/realizacja-17.jpeg",
+      "alt": "Realizacja Stolkor 17"
+    },
+    {
+      "src": "/images/gallery/realizacja-18.jpeg",
+      "alt": "Realizacja Stolkor 18"
+    },
+    {
+      "src": "/images/gallery/realizacja-19.jpeg",
+      "alt": "Realizacja Stolkor 19"
+    },
+    {
+      "src": "/images/gallery/realizacja-20.jpeg",
+      "alt": "Realizacja Stolkor 20"
+    },
+    {
+      "src": "/images/gallery/realizacja-21.jpeg",
+      "alt": "Realizacja Stolkor 21"
+    },
+    {
+      "src": "/images/gallery/realizacja-22.jpeg",
+      "alt": "Realizacja Stolkor 22"
+    },
+    {
+      "src": "/images/gallery/realizacja-23.jpeg",
+      "alt": "Realizacja Stolkor 23"
+    },
+    {
+      "src": "/images/gallery/realizacja-24.jpeg",
+      "alt": "Realizacja Stolkor 24"
+    },
+    {
+      "src": "/images/gallery/realizacja-25.jpeg",
+      "alt": "Realizacja Stolkor 25"
+    },
+    {
+      "src": "/images/gallery/realizacja-26.jpeg",
+      "alt": "Realizacja Stolkor 26"
+    },
+    {
+      "src": "/images/gallery/realizacja-27.jpeg",
+      "alt": "Realizacja Stolkor 27"
+    }
   ]
 }

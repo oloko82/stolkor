@@ -14,62 +14,28 @@ content:
     type: file
     path: src/data/site.json
     format: json
-
     fields:
-      - name: company
-        label: Nazwa firmy
-        type: string
-
-      - name: title
-        label: Tytuł strony
-        type: string
-
-      - name: description
-        label: Opis dla Google
-        type: text
-
+      - { name: company, label: Nazwa firmy, type: string }
+      - { name: title, label: Tytuł strony, type: string }
+      - { name: description, label: Opis dla Google, type: text }
       - name: intro
         label: Tekst o firmie
-        type: text
-
-      - name: experience
-        label: Lata doświadczenia
         type: string
-
-      - name: customers
-        label: Zadowoleni klienci
-        type: string
-
-      - name: phoneFurniture
-        label: Telefon – meble i kuchnie
-        type: string
-
-      - name: phoneFurnitureLabel
-        label: Opis pierwszego telefonu
-        type: string
-
-      - name: phoneJoinery
-        label: Telefon – schody i drzwi
-        type: string
-
-      - name: phoneJoineryLabel
-        label: Opis drugiego telefonu
-        type: string
-
-      - name: contactText
-        label: Tekst kontaktowy
-        type: text
-
-      - name: copyright
-        label: Nazwa w stopce
-        type: string
+        list: true
+      - { name: experience, label: Lata doświadczenia, type: string }
+      - { name: customers, label: Zadowoleni klienci, type: string }
+      - { name: phoneFurniture, label: Telefon – meble i kuchnie, type: string }
+      - { name: phoneFurnitureLabel, label: Opis pierwszego telefonu, type: string }
+      - { name: phoneJoinery, label: Telefon – schody i drzwi, type: string }
+      - { name: phoneJoineryLabel, label: Opis drugiego telefonu, type: string }
+      - { name: contactText, label: Tekst kontaktowy, type: text }
+      - { name: copyright, label: Nazwa w stopce, type: string }
 
   - name: gallery
     label: Galeria
     type: file
     path: src/data/gallery.json
     format: json
-
     fields:
       - name: images
         label: Zdjęcia
@@ -79,13 +45,5 @@ content:
             collapsed: true
             summary: "{alt}"
         fields:
-          - name: src
-            label: Plik zdjęcia
-            type: image
-            required: true
-
-          - name: alt
-            label: Opis zdjęcia
-            type: string
-            required: true
-            description: Krótki opis zdjęcia używany m.in. przez Google i czytniki ekranu.
+          - { name: src, label: Plik zdjęcia, type: image, required: true }
+          - { name: alt, label: Opis zdjęcia, type: string, required: true }
