@@ -31,7 +31,7 @@ content:
       - name: fontAbout
         label: "Rozmiar tekstu o firmie (px)"
         type: string
-        default: "20"
+        default: "21"
 
       - name: fontStats
         label: "Rozmiar dużych liczb 10+ / 657+ (px)"
