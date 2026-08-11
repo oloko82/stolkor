@@ -1,0 +1,104 @@
+---
+import siteData from '../data/site.json';
+
+const site = siteData as typeof siteData & {
+  address?: string;
+};
+
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+
+const siteRoot = Astro.site
+  ? new URL(base, Astro.site)
+  : new URL(Astro.url.pathname, Astro.url);
+
+const canonicalUrl = siteRoot.href;
+const hostname = siteRoot.hostname.toLowerCase();
+
+const isProductionDomain =
+  hostname === 'stolkor.pl' || hostname === 'www.stolkor.pl';
+
+const robots = isProductionDomain
+  ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
+  : 'noindex,nofollow,noarchive';
+
+const logoUrl = new URL(`${base}images/logo.webp`, Astro.site ?? Astro.url).href;
+const ogImageUrl = new URL(`${base}og-image.jpg`, Astro.site ?? Astro.url).href;
+const favicon48 = `${base}favicon-48.png`;
+const favicon192 = `${base}favicon-192.png`;
+const appleTouchIcon = `${base}apple-touch-icon.png`;
+const manifestUrl = `${base}site.webmanifest`;
+const sitemapUrl = new URL('sitemap-index.xml', siteRoot).href;
+
+const address = site.address || 'Przeździedza 1, 59-610 Przeździedza';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${canonicalUrl}#website`,
+      url: canonicalUrl,
+      name: 'Stolkor',
+      description: site.description,
+      inLanguage: 'pl-PL',
+      publisher: {
+        '@id': `${canonicalUrl}#business`,
+      },
+    },
+    {
+      '@type': 'LocalBusiness',
+      '@id': `${canonicalUrl}#business`,
+      name: site.company,
+      url: canonicalUrl,
+      description: site.description,
+      logo: logoUrl,
+      image: ogImageUrl,
+      telephone: [
+        site.phoneFurniture,
+        site.phoneJoinery,
+      ],
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: 'Przeździedza 1',
+        postalCode: '59-610',
+        addressLocality: 'Przeździedza',
+        addressCountry: 'PL',
+      },
+    },
+  ],
+};
+---
+
+<title>{site.title}</title>
+<meta name="description" content={site.description} />
+<meta name="robots" content={robots} />
+
+<link rel="canonical" href={canonicalUrl} />
+<link rel="sitemap" href={sitemapUrl} />
+
+<link rel="icon" type="image/png" sizes="48x48" href={favicon48} />
+<link rel="icon" type="image/png" sizes="192x192" href={favicon192} />
+<link rel="apple-touch-icon" sizes="180x180" href={appleTouchIcon} />
+<link rel="manifest" href={manifestUrl} />
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content="pl_PL" />
+<meta property="og:site_name" content="Stolkor" />
+<meta property="og:title" content={site.title} />
+<meta property="og:description" content={site.description} />
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Stolkor - usługi stolarskie" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={site.title} />
+<meta name="twitter:description" content={site.description} />
+<meta name="twitter:image" content={ogImageUrl} />
+
+<script
+  type="application/ld+json"
+  set:html={JSON.stringify(structuredData)}
+></script>

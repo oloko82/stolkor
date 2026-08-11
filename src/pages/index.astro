@@ -1,5 +1,6 @@
 ---
 import Gallery from '../components/Gallery.astro';
+import Seo from '../components/Seo.astro';
 import site from '../data/site.json';
 import '../styles/global.css';
 import '../styles/polish.css';
@@ -13,7 +14,14 @@ const year = new Date().getFullYear();
 const content = site as typeof site & {
   servicesLine?: string;
   address?: string;
+  fontMenu?: string;
+  fontAbout?: string;
   fontServices?: string;
+  fontStats?: string;
+  fontStatsLabel?: string;
+  fontContactTitle?: string;
+  fontContact?: string;
+  fontFooter?: string;
   mapEmbed?: string;
 };
 
@@ -59,9 +67,8 @@ const typographyStyle = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={content.description} />
+    <Seo />
     <meta name="theme-color" content="#e5e5e5" />
-    <title>{content.title}</title>
   </head>
 
   <body id="Start">
@@ -85,7 +92,6 @@ const typographyStyle = [
         <div class="shell about-grid">
           <div class="about-copy">
             {introParagraphs.map((paragraph) => <p>{paragraph}</p>)}
-
             <p class="services-line">{servicesLine}</p>
           </div>
 

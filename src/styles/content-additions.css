@@ -1,18 +1,7 @@
-
-/*
- * Dodatki treściowe:
- * - krótka lista usług pod opisem,
- * - klikalny adres w sekcji kontaktowej.
- *
- * Plik jest celowo osobny, żeby nie ruszać zaakceptowanej geometrii strony.
- */
-
 .about-copy .services-line {
   margin-top: 32px;
   margin-bottom: 0;
-
   color: #777883;
-
   font-size: var(--font-services, 16px);
   line-height: 1.6;
   font-weight: 500;
@@ -26,7 +15,6 @@
 @media (max-width: 680px) {
   .about-copy .services-line {
     margin-top: 24px;
-
     font-size: min(var(--font-services, 16px), 14px);
     line-height: 1.55;
   }
