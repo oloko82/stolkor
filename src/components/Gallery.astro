@@ -1,8 +1,8 @@
-
 ---
 import gallery from '../data/gallery.json';
 
-const base = import.meta.env.BASE_URL;
+const rawBase = import.meta.env.BASE_URL;
+const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 ---
 
 <section class="gallery" id="galeria" aria-label="Galeria realizacji">
@@ -67,7 +67,6 @@ const base = import.meta.env.BASE_URL;
     if (!dialog || !image || !images.length) return;
 
     current = (index + images.length) % images.length;
-
     image.src = `${base}${images[current].src.replace(/^\//, '')}`;
     image.alt = images[current].alt;
   };
