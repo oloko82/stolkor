@@ -14,8 +14,20 @@ content:
       - { name: title, label: Tytuł strony, type: string }
       - { name: description, label: Opis dla Google, type: text }
       - { name: intro, label: Tekst o firmie, type: text }
+
+      - name: servicesLine
+        label: Krótka lista usług
+        type: string
+        default: "Meble na wymiar · Kuchnie · Schody · Drzwi"
+
       - { name: experience, label: Lata doświadczenia, type: string }
       - { name: customers, label: Zadowoleni klienci, type: string }
+
+      - name: address
+        label: Adres firmy
+        type: string
+        default: "Przeździedza 1, 59-610 Przeździedza"
+
       - { name: phoneFurniture, label: Telefon – meble i kuchnie, type: string }
       - { name: phoneFurnitureLabel, label: Opis pierwszego telefonu, type: string }
       - { name: phoneJoinery, label: Telefon – schody i drzwi, type: string }
@@ -32,6 +44,11 @@ content:
         label: "Rozmiar tekstu o firmie (px)"
         type: string
         default: "21"
+
+      - name: fontServices
+        label: "Rozmiar krótkiej listy usług (px)"
+        type: string
+        default: "16"
 
       - name: fontStats
         label: "Rozmiar dużych liczb 10+ / 657+ (px)"

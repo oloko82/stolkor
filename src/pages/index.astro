@@ -3,20 +3,37 @@ import Gallery from '../components/Gallery.astro';
 import site from '../data/site.json';
 import '../styles/global.css';
 import '../styles/polish.css';
+import '../styles/content-additions.css';
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 const tel = (number) => `tel:${String(number).replace(/[^\d+]/g, '')}`;
 const year = new Date().getFullYear();
 
-const introParagraphs = Array.isArray(site.intro)
-  ? site.intro
-  : [site.intro].filter(Boolean);
+const content = site as typeof site & {
+  servicesLine?: string;
+  address?: string;
+  fontServices?: string;
+  mapEmbed?: string;
+};
+
+const introParagraphs = Array.isArray(content.intro)
+  ? content.intro
+  : [content.intro].filter(Boolean);
+
+const servicesLine =
+  content.servicesLine || 'Meble na wymiar · Kuchnie · Schody · Drzwi';
+
+const address =
+  content.address || 'Przeździedza 1, 59-610 Przeździedza';
+
+const mapsUrl =
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
 const defaultMapEmbed =
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2507.9122663555568!2d15.68809381571674!3d51.054707751521406!2m3!1f0!2f0!3f0!2m3!1i1024!2i768!4f13.1!3m3!1m2!1s0x470f24197deba825%3A0xaed33a3c5b79b973!2sPrze%C5%BAdziedza%201%2C%2059-610%20Prze%C5%BAdziedza!5e0!3m2!1spl!2spl!4v1627841523398!5m2!1spl!2spl';
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2507.9122663555568!2d15.68809381571674!3d51.054707751521406!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470f24197deba825%3A0xaed33a3c5b79b973!2sPrze%C5%BAdziedza%201%2C%2059-610%20Prze%C5%BAdziedza!5e0!3m2!1spl!2spl!4v1627841523398!5m2!1spl!2spl';
 
-const mapEmbed = site.mapEmbed || defaultMapEmbed;
+const mapEmbed = content.mapEmbed || defaultMapEmbed;
 
 const font = (value, fallback) => {
   const parsed = Number.parseFloat(String(value));
@@ -26,13 +43,14 @@ const font = (value, fallback) => {
 };
 
 const typographyStyle = [
-  `--font-menu:${font(site.fontMenu, 20)}`,
-  `--font-about:${font(site.fontAbout, 30)}`,
-  `--font-stats:${font(site.fontStats, 68)}`,
-  `--font-stats-label:${font(site.fontStatsLabel, 16)}`,
-  `--font-contact-title:${font(site.fontContactTitle, 42)}`,
-  `--font-contact:${font(site.fontContact, 18)}`,
-  `--font-footer:${font(site.fontFooter, 14)}`
+  `--font-menu:${font(content.fontMenu, 20)}`,
+  `--font-about:${font(content.fontAbout, 30)}`,
+  `--font-services:${font(content.fontServices, 16)}`,
+  `--font-stats:${font(content.fontStats, 68)}`,
+  `--font-stats-label:${font(content.fontStatsLabel, 16)}`,
+  `--font-contact-title:${font(content.fontContactTitle, 42)}`,
+  `--font-contact:${font(content.fontContact, 18)}`,
+  `--font-footer:${font(content.fontFooter, 14)}`
 ].join(';');
 ---
 
@@ -41,9 +59,9 @@ const typographyStyle = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={site.description} />
+    <meta name="description" content={content.description} />
     <meta name="theme-color" content="#e5e5e5" />
-    <title>{site.title}</title>
+    <title>{content.title}</title>
   </head>
 
   <body id="Start">
@@ -67,15 +85,17 @@ const typographyStyle = [
         <div class="shell about-grid">
           <div class="about-copy">
             {introParagraphs.map((paragraph) => <p>{paragraph}</p>)}
+
+            <p class="services-line">{servicesLine}</p>
           </div>
 
           <div class="stat">
-            <strong>{site.experience}</strong>
+            <strong>{content.experience}</strong>
             <span>Lat doświadczenia</span>
           </div>
 
           <div class="stat">
-            <strong>{site.customers}</strong>
+            <strong>{content.customers}</strong>
             <span>Zadowolonych klientów</span>
           </div>
         </div>
@@ -115,28 +135,44 @@ const typographyStyle = [
                     <path d="M7 9h4M7 13h7M16 9h1"></path>
                   </svg>
                 </span>
-                <span>{site.company.toUpperCase()}</span>
+                <span>{content.company.toUpperCase()}</span>
               </p>
 
-              <a class="contact-line" href={tel(site.phoneFurniture)}>
+              <a
+                class="contact-line address-line"
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Otwórz adres w Mapach Google: ${address}`}
+              >
+                <span class="contact-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z"></path>
+                    <circle cx="12" cy="10" r="2.2"></circle>
+                  </svg>
+                </span>
+                <span>{address}</span>
+              </a>
+
+              <a class="contact-line" href={tel(content.phoneFurniture)}>
                 <span class="contact-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24">
                     <path d="M5.5 3.8 8 3l2 5-2 1.4a15 15 0 0 0 6.6 6.6L16 14l5 2-.8 2.5c-.3 1-1.2 1.7-2.3 1.7C10.2 20.2 3.8 13.8 3.8 6.1c0-1 .7-2 1.7-2.3Z"></path>
                   </svg>
                 </span>
-                <span>{site.phoneFurniture} - {site.phoneFurnitureLabel}</span>
+                <span>{content.phoneFurniture} - {content.phoneFurnitureLabel}</span>
               </a>
 
-              <a class="contact-line" href={tel(site.phoneJoinery)}>
+              <a class="contact-line" href={tel(content.phoneJoinery)}>
                 <span class="contact-icon" aria-hidden="true">
                   <svg viewBox="0 0 24 24">
                     <path d="M5.5 3.8 8 3l2 5-2 1.4a15 15 0 0 0 6.6 6.6L16 14l5 2-.8 2.5c-.3 1-1.2 1.7-2.3 1.7C10.2 20.2 3.8 13.8 3.8 6.1c0-1 .7-2 1.7-2.3Z"></path>
                   </svg>
                 </span>
-                <span>{site.phoneJoinery} - {site.phoneJoineryLabel}</span>
+                <span>{content.phoneJoinery} - {content.phoneJoineryLabel}</span>
               </a>
 
-              <p class="contact-note">{site.contactText}</p>
+              <p class="contact-note">{content.contactText}</p>
             </address>
           </div>
         </div>
@@ -144,7 +180,7 @@ const typographyStyle = [
     </main>
 
     <footer class="site-footer">
-      <div class="shell">© {year} {site.copyright}</div>
+      <div class="shell">© {year} {content.copyright}</div>
     </footer>
   </body>
 </html>
