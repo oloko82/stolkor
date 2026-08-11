@@ -1,7 +1,8 @@
 
 /*
- * Prawdziwy masonry dla Stolkor.
- * Każde kolejne zdjęcie jest umieszczane przez JS w aktualnie najkrótszej kolumnie.
+ * True masonry + responsive images.
+ * JS places each next image in the shortest column.
+ * .masonry-source remains a CSS-columns fallback until JS performs layout.
  */
 
 .gallery-section {
@@ -15,6 +16,8 @@
 
 .masonry-source {
   width: 100%;
+  column-count: 4;
+  column-gap: 10px;
 }
 
 .masonry-source[hidden] {
@@ -42,12 +45,17 @@
 .gallery-item {
   display: block;
   width: 100%;
-  margin: 0;
+  margin: 0 0 10px;
   padding: 0;
   border: 0;
   background: transparent;
+  break-inside: avoid;
   cursor: zoom-in;
   overflow: hidden;
+}
+
+.masonry-column .gallery-item {
+  margin-bottom: 0;
 }
 
 .gallery-item img {
@@ -109,17 +117,18 @@
   font-size: 54px;
 }
 
-.lightbox-prev {
-  left: 10px;
-}
+.lightbox-prev { left: 10px; }
+.lightbox-next { right: 10px; }
 
-.lightbox-next {
-  right: 10px;
+@media (max-width: 980px) {
+  .masonry-source {
+    column-count: 3;
+  }
 }
 
 @media (max-width: 680px) {
-  .gallery-section {
-    padding-block: 10px;
+  .masonry-source {
+    column-count: 2;
   }
 
   .lightbox-nav {

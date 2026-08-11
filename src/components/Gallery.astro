@@ -1,9 +1,42 @@
 ---
 import gallery from '../data/gallery.json';
+import optimizedManifest from '../data/gallery-optimized.json';
 import '../styles/masonry.css';
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+
+const withBase = (src) => `${base}${src.replace(/^\//, '')}`;
+
+const items = gallery.images.map((item, index) => {
+  const optimized = optimizedManifest.images?.[item.src];
+
+  if (!optimized) {
+    return {
+      ...item,
+      index,
+      src: withBase(item.src),
+      srcset: undefined,
+      width: undefined,
+      height: undefined,
+      lightbox: withBase(item.src),
+    };
+  }
+
+  return {
+    ...item,
+    index,
+    src: withBase(optimized.sources['960']),
+    srcset: [
+      `${withBase(optimized.sources['480'])} 480w`,
+      `${withBase(optimized.sources['960'])} 960w`,
+      `${withBase(optimized.sources['1600'])} 1600w`,
+    ].join(', '),
+    width: optimized.width,
+    height: optimized.height,
+    lightbox: withBase(optimized.sources['1600']),
+  };
+});
 ---
 
 <section class="gallery-section" id="Galeria" aria-label="Galeria realizacji">
@@ -11,21 +44,25 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     class="masonry"
     data-masonry
     data-masonry-gap="10"
-    aria-live="off"
   >
     <div class="masonry-source" data-masonry-source>
-      {gallery.images.map((item, index) => (
+      {items.map((item) => (
         <button
           class="gallery-item"
           type="button"
-          data-lightbox-index={index}
+          data-lightbox-index={item.index}
           aria-label={`Otwórz zdjęcie: ${item.alt}`}
         >
           <img
-            src={`${base}${item.src.replace(/^\//, '')}`}
+            src={item.src}
+            srcset={item.srcset}
+            sizes="(max-width: 680px) calc((100vw - 10px) / 2), (max-width: 980px) calc((100vw - 20px) / 3), calc((100vw - 30px) / 4)"
+            width={item.width}
+            height={item.height}
             alt={item.alt}
-            loading={index > 5 ? 'lazy' : 'eager'}
+            loading={item.index > 5 ? 'lazy' : 'eager'}
             decoding="async"
+            fetchpriority={item.index < 4 ? 'high' : 'auto'}
           />
         </button>
       ))}
@@ -36,38 +73,13 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 </section>
 
 <dialog class="lightbox" id="lightbox">
-  <button
-    class="lightbox-close"
-    type="button"
-    aria-label="Zamknij"
-  >
-    ×
-  </button>
-
-  <button
-    class="lightbox-nav lightbox-prev"
-    type="button"
-    aria-label="Poprzednie zdjęcie"
-  >
-    ‹
-  </button>
-
-  <img
-    class="lightbox-image"
-    src=""
-    alt=""
-  />
-
-  <button
-    class="lightbox-nav lightbox-next"
-    type="button"
-    aria-label="Następne zdjęcie"
-  >
-    ›
-  </button>
+  <button class="lightbox-close" type="button" aria-label="Zamknij">×</button>
+  <button class="lightbox-nav lightbox-prev" type="button" aria-label="Poprzednie zdjęcie">‹</button>
+  <img class="lightbox-image" src="" alt="" />
+  <button class="lightbox-nav lightbox-next" type="button" aria-label="Następne zdjęcie">›</button>
 </dialog>
 
-<script define:vars={{ images: gallery.images, base }}>
+<script define:vars={{ lightboxItems: items.map(({ alt, lightbox }) => ({ alt, lightbox })) }}>
   const masonry = document.querySelector('[data-masonry]');
   const source = masonry?.querySelector('[data-masonry-source]');
   const columnsHost = masonry?.querySelector('[data-masonry-columns]');
@@ -80,29 +92,10 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
   let currentColumnCount = 0;
   let resizeTimer;
 
-  const imageUrl = (src) => `${base}${src.replace(/^\//, '')}`;
-
   const getColumnCount = () => {
-    const width = window.innerWidth;
-
-    if (width <= 680) return 2;
-    if (width <= 980) return 3;
+    if (window.innerWidth <= 680) return 2;
+    if (window.innerWidth <= 980) return 3;
     return 4;
-  };
-
-  const waitForImages = async (items) => {
-    await Promise.all(
-      items.map((item) => {
-        const img = item.querySelector('img');
-
-        if (!img || img.complete) return Promise.resolve();
-
-        return new Promise((resolve) => {
-          img.addEventListener('load', resolve, { once: true });
-          img.addEventListener('error', resolve, { once: true });
-        });
-      })
-    );
   };
 
   const makeColumns = (count) => {
@@ -126,7 +119,7 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     }, columns[0]);
   };
 
-  const layoutMasonry = async (force = false) => {
+  const layoutMasonry = (force = false) => {
     if (!source || !columnsHost) return;
 
     const desiredColumns = getColumnCount();
@@ -140,52 +133,37 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
     existingItems.forEach((item) => source.appendChild(item));
 
-    const items = Array.from(
-      source.querySelectorAll('.gallery-item')
-    );
-
     const columns = makeColumns(desiredColumns);
-
-    source.hidden = false;
-
-    await waitForImages(items);
+    const items = Array.from(source.querySelectorAll('.gallery-item'));
 
     items.forEach((item) => {
-      const target = shortestColumn(columns);
-      target.appendChild(item);
+      shortestColumn(columns).appendChild(item);
     });
 
     source.hidden = true;
   };
 
   const showLightbox = (index) => {
-    if (!dialog || !lightboxImage || !images.length) return;
+    if (!dialog || !lightboxImage || !lightboxItems.length) return;
 
-    current = (index + images.length) % images.length;
-    lightboxImage.src = imageUrl(images[current].src);
-    lightboxImage.alt = images[current].alt;
+    current = (index + lightboxItems.length) % lightboxItems.length;
+
+    lightboxImage.src = lightboxItems[current].lightbox;
+    lightboxImage.alt = lightboxItems[current].alt;
   };
 
   document.addEventListener('click', (event) => {
     const button = event.target.closest?.('[data-lightbox-index]');
 
-    if (button) {
-      showLightbox(Number(button.dataset.lightboxIndex));
-      dialog?.showModal();
-    }
+    if (!button) return;
+
+    showLightbox(Number(button.dataset.lightboxIndex));
+    dialog?.showModal();
   });
 
-  dialog
-    ?.querySelector('.lightbox-close')
-    ?.addEventListener('click', () => dialog.close());
-
-  dialog
-    ?.querySelector('.lightbox-prev')
-    ?.addEventListener('click', () => showLightbox(current - 1));
-
-  dialog
-    ?.querySelector('.lightbox-next')
-    ?.addEventListener('click', () => showLightbox(current + 1));
+  dialog?.querySelector('.lightbox-close')?.addEventListener('click', () => dialog.close());
+  dialog?.querySelector('.lightbox-prev')?.addEventListener('click', () => showLightbox(current - 1));
+  dialog?.querySelector('.lightbox-next')?.addEventListener('click', () => showLightbox(current + 1));
 
   dialog?.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
@@ -204,9 +182,5 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     resizeTimer = setTimeout(() => layoutMasonry(false), 140);
   });
 
-  window.addEventListener('load', () => layoutMasonry(true), { once: true });
-
-  if (document.readyState === 'complete') {
-    layoutMasonry(true);
-  }
+  layoutMasonry(true);
 </script>
