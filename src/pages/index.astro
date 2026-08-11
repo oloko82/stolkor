@@ -18,7 +18,7 @@ const year = new Date().getFullYear();
     <header class="masthead">
       <nav class="topbar shell" aria-label="Główna nawigacja">
         <a href="#start" class="brand" aria-label="Stolkor – początek strony">
-          <img src="/images/logo.webp" alt="Stolkor" width="238" height="190" />
+          <img src={`${import.meta.env.BASE_URL}images/logo.webp`} alt="Stolkor" width="238" height="190" />
         </a>
         <div class="nav-links">
           <a href="#galeria"><span aria-hidden="true">›</span> Galeria</a>

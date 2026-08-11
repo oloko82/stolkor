@@ -1,45 +1,105 @@
+
 ---
 import gallery from '../data/gallery.json';
+
+const base = import.meta.env.BASE_URL;
 ---
+
 <section class="gallery" id="galeria" aria-label="Galeria realizacji">
   <div class="gallery-grid">
     {gallery.images.map((image, index) => (
-      <button class={`gallery-item item-${index + 1}`} type="button" data-lightbox-index={index} aria-label={`Otwórz zdjęcie: ${image.alt}`}>
-        <img src={image.src} alt={image.alt} loading={index > 3 ? 'lazy' : 'eager'} decoding="async" />
+      <button
+        class={`gallery-item item-${index + 1}`}
+        type="button"
+        data-lightbox-index={index}
+        aria-label={`Otwórz zdjęcie: ${image.alt}`}
+      >
+        <img
+          src={`${base}${image.src.replace(/^\//, '')}`}
+          alt={image.alt}
+          loading={index > 3 ? 'lazy' : 'eager'}
+          decoding="async"
+        />
       </button>
     ))}
   </div>
 </section>
 
 <dialog class="lightbox" id="lightbox">
-  <button class="lightbox-close" type="button" aria-label="Zamknij">×</button>
-  <button class="lightbox-nav lightbox-prev" type="button" aria-label="Poprzednie zdjęcie">‹</button>
-  <img class="lightbox-image" src="" alt="" />
-  <button class="lightbox-nav lightbox-next" type="button" aria-label="Następne zdjęcie">›</button>
+  <button
+    class="lightbox-close"
+    type="button"
+    aria-label="Zamknij"
+  >
+    ×
+  </button>
+
+  <button
+    class="lightbox-nav lightbox-prev"
+    type="button"
+    aria-label="Poprzednie zdjęcie"
+  >
+    ‹
+  </button>
+
+  <img
+    class="lightbox-image"
+    src=""
+    alt=""
+  />
+
+  <button
+    class="lightbox-nav lightbox-next"
+    type="button"
+    aria-label="Następne zdjęcie"
+  >
+    ›
+  </button>
 </dialog>
 
-<script define:vars={{ images: gallery.images }}>
+<script define:vars={{ images: gallery.images, base }}>
   const dialog = document.querySelector('#lightbox');
   const image = dialog?.querySelector('.lightbox-image');
+
   let current = 0;
+
   const show = (index) => {
     if (!dialog || !image || !images.length) return;
+
     current = (index + images.length) % images.length;
-    image.src = images[current].src;
+
+    image.src = `${base}${images[current].src.replace(/^\//, '')}`;
     image.alt = images[current].alt;
   };
+
   document.querySelectorAll('[data-lightbox-index]').forEach((button) => {
     button.addEventListener('click', () => {
       show(Number(button.dataset.lightboxIndex));
       dialog?.showModal();
     });
   });
-  dialog?.querySelector('.lightbox-close')?.addEventListener('click', () => dialog.close());
-  dialog?.querySelector('.lightbox-prev')?.addEventListener('click', () => show(current - 1));
-  dialog?.querySelector('.lightbox-next')?.addEventListener('click', () => show(current + 1));
-  dialog?.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+
+  dialog
+    ?.querySelector('.lightbox-close')
+    ?.addEventListener('click', () => dialog.close());
+
+  dialog
+    ?.querySelector('.lightbox-prev')
+    ?.addEventListener('click', () => show(current - 1));
+
+  dialog
+    ?.querySelector('.lightbox-next')
+    ?.addEventListener('click', () => show(current + 1));
+
+  dialog?.addEventListener('click', (event) => {
+    if (event.target === dialog) {
+      dialog.close();
+    }
+  });
+
   document.addEventListener('keydown', (event) => {
     if (!dialog?.open) return;
+
     if (event.key === 'ArrowLeft') show(current - 1);
     if (event.key === 'ArrowRight') show(current + 1);
     if (event.key === 'Escape') dialog.close();
