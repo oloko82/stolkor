@@ -49,7 +49,7 @@ content:
       - name: fontMenu
         label: "Rozmiar menu (px)"
         type: string
-        default: "20"
+        default: "24"
 
       - name: fontAbout
         label: "Rozmiar tekstu o firmie (px)"
