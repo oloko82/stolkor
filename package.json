@@ -16,5 +16,8 @@
   },
   "devDependencies": {
     "sharp": "^0.35.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.2": true
   }
 }

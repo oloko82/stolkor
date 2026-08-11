@@ -3,140 +3,145 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import sharp from 'sharp';
 
-const projectRoot = process.cwd();
-const galleryJsonPath = path.join(projectRoot, 'src', 'data', 'gallery.json');
-const manifestPath = path.join(projectRoot, 'src', 'data', 'gallery-optimized.json');
-const publicDir = path.join(projectRoot, 'public');
+const root = process.cwd();
+const publicDir = path.join(root, 'public');
+const galleryJson = path.join(root, 'src', 'data', 'gallery.json');
+const manifestJson = path.join(root, 'src', 'data', 'gallery-optimized.json');
 const outputDir = path.join(publicDir, 'images', 'gallery-optimized');
 
-const widths = [480, 960, 1600];
+const variants = [
+  { target: 480, quality: 78 },
+  { target: 960, quality: 80 },
+  { target: 1600, quality: 82 },
+];
 
-const webpQuality = {
-  480: 78,
-  960: 80,
-  1600: 82,
-};
-
-function publicPathToFile(src) {
+function sourceFile(src) {
   const clean = src.split('?')[0].split('#')[0].replace(/^\/+/, '');
   return path.join(publicDir, ...clean.split('/'));
 }
 
-function safeStem(src) {
-  const fileName = decodeURIComponent(src.split('/').pop() || 'image');
-  const stem = fileName.replace(/\.[^.]+$/, '');
+function safeName(src) {
+  const file = decodeURIComponent(src.split('/').pop() || 'image');
+  const stem = file.replace(/\.[^.]+$/, '');
 
-  const normalized = stem
-    .normalize('NFKD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-zA-Z0-9._-]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-  const hash = crypto
-    .createHash('sha1')
-    .update(src)
-    .digest('hex')
-    .slice(0, 8);
-
-  return `${normalized || 'image'}-${hash}`;
+  return (
+    stem
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9_-]+/g, '-')
+      .replace(/^-+|-+$/g, '') || 'image'
+  );
 }
 
-async function exists(filePath) {
+async function fileExists(file) {
   try {
-    await fs.access(filePath);
+    await fs.access(file);
     return true;
   } catch {
     return false;
   }
 }
 
-async function optimizeOne(src) {
-  const inputPath = publicPathToFile(src);
+async function optimize(src) {
+  const input = sourceFile(src);
 
-  if (!(await exists(inputPath))) {
-    throw new Error(`Brak pliku galerii: ${src}\nOczekiwano: ${inputPath}`);
+  if (!(await fileExists(input))) {
+    throw new Error(`Nie znaleziono zdjęcia: ${src}\nPlik: ${input}`);
   }
 
-  const stem = safeStem(src);
-  const generated = {};
+  const bytes = await fs.readFile(input);
+  const contentHash = crypto
+    .createHash('sha1')
+    .update(bytes)
+    .digest('hex')
+    .slice(0, 10);
 
-  let displayWidth = 0;
-  let displayHeight = 0;
+  const originalMeta = await sharp(bytes, { failOn: 'none' })
+    .rotate()
+    .metadata();
 
-  for (const width of widths) {
-    const fileName = `${stem}-${width}.webp`;
-    const outputPath = path.join(outputDir, fileName);
+  const originalWidth = originalMeta.width || 1;
+  const originalHeight = originalMeta.height || 1;
 
-    const info = await sharp(inputPath)
+  const sources = [];
+  const seenWidths = new Set();
+
+  for (const variant of variants) {
+    const outputName = `${safeName(src)}-${contentHash}-${variant.target}.webp`;
+    const outputFile = path.join(outputDir, outputName);
+
+    const info = await sharp(bytes, { failOn: 'none' })
       .rotate()
       .resize({
-        width,
+        width: variant.target,
         withoutEnlargement: true,
         fit: 'inside',
       })
       .webp({
-        quality: webpQuality[width],
+        quality: variant.quality,
         effort: 4,
         smartSubsample: true,
       })
-      .toFile(outputPath);
+      .toFile(outputFile);
 
-    generated[String(width)] = `/images/gallery-optimized/${fileName}`;
+    // Nie dodawaj identycznych szerokości kilka razy dla małych źródeł.
+    if (!seenWidths.has(info.width)) {
+      seenWidths.add(info.width);
 
-    if (width === 1600) {
-      displayWidth = info.width;
-      displayHeight = info.height;
+      sources.push({
+        width: info.width,
+        height: info.height,
+        src: `/images/gallery-optimized/${outputName}`,
+      });
     }
   }
 
+  sources.sort((a, b) => a.width - b.width);
+
   return {
-    width: displayWidth,
-    height: displayHeight,
-    sources: generated,
+    originalWidth,
+    originalHeight,
+    ratio: originalHeight / originalWidth,
+    sources,
+    fallback: sources.at(-1)?.src ?? src,
   };
 }
 
 async function main() {
-  const gallery = JSON.parse(await fs.readFile(galleryJsonPath, 'utf8'));
+  const gallery = JSON.parse(await fs.readFile(galleryJson, 'utf8'));
 
   if (!Array.isArray(gallery.images)) {
-    throw new Error('src/data/gallery.json nie zawiera tablicy "images".');
+    throw new Error('gallery.json nie zawiera tablicy "images".');
   }
 
   await fs.rm(outputDir, { recursive: true, force: true });
   await fs.mkdir(outputDir, { recursive: true });
 
-  const manifest = {
-    images: {},
-  };
+  const manifest = { images: {} };
 
-  console.log(`Optymalizacja galerii: ${gallery.images.length} zdjęć`);
+  console.log(`Optymalizacja ${gallery.images.length} zdjęć...`);
 
-  for (let index = 0; index < gallery.images.length; index++) {
-    const item = gallery.images[index];
+  for (let i = 0; i < gallery.images.length; i++) {
+    const item = gallery.images[i];
 
     if (!item?.src) {
-      throw new Error(`Brak pola "src" dla zdjęcia nr ${index + 1}.`);
+      throw new Error(`Brak "src" przy zdjęciu nr ${i + 1}.`);
     }
 
-    console.log(`[${index + 1}/${gallery.images.length}] ${item.src}`);
-
-    manifest.images[item.src] = await optimizeOne(item.src);
+    console.log(`[${i + 1}/${gallery.images.length}] ${item.src}`);
+    manifest.images[item.src] = await optimize(item.src);
   }
 
   await fs.writeFile(
-    manifestPath,
+    manifestJson,
     `${JSON.stringify(manifest, null, 2)}\n`,
     'utf8',
   );
 
-  console.log('');
-  console.log('Gotowe: wygenerowano WebP 480 / 960 / 1600 px.');
+  console.log('Gotowe: responsywne WebP 480 / 960 / 1600 px.');
 }
 
 main().catch((error) => {
-  console.error('');
-  console.error('Błąd optymalizacji obrazów:');
   console.error(error);
   process.exit(1);
 });

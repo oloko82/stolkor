@@ -1,24 +1,59 @@
 ---
 import gallery from '../data/gallery.json';
+import optimized from '../data/gallery-optimized.json';
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
+const addBase = (src) => `${base}${src.replace(/^\//, '')}`;
+
+const items = gallery.images.map((item, index) => {
+  const opt = optimized.images?.[item.src];
+  const sources = opt?.sources ?? [];
+
+  const srcset = sources.length
+    ? sources.map((source) => `${addBase(source.src)} ${source.width}w`).join(', ')
+    : undefined;
+
+  const fallback = sources.length
+    ? addBase(opt.fallback)
+    : addBase(item.src);
+
+  const lightbox = sources.length
+    ? addBase(sources.at(-1).src)
+    : addBase(item.src);
+
+  return {
+    ...item,
+    index,
+    src: fallback,
+    srcset,
+    lightbox,
+    width: opt?.originalWidth,
+    height: opt?.originalHeight,
+    ratio: opt?.ratio ?? 1,
+  };
+});
 ---
 
 <section class="gallery-section" id="Galeria" aria-label="Galeria realizacji">
   <div class="true-masonry" data-masonry data-gap="10">
     <div class="masonry-source" data-masonry-source>
-      {gallery.images.map((item, index) => (
+      {items.map((item) => (
         <button
           class="gallery-item"
           type="button"
-          data-lightbox-index={index}
+          data-lightbox-index={item.index}
+          data-ratio={item.ratio}
           aria-label={`Otwórz zdjęcie: ${item.alt}`}
         >
           <img
-            src={`${base}${item.src.replace(/^\//, '')}`}
+            src={item.src}
+            srcset={item.srcset}
+            sizes="(max-width: 680px) 50vw, (max-width: 980px) 33vw, 25vw"
+            width={item.width}
+            height={item.height}
             alt={item.alt}
-            loading={index > 5 ? 'lazy' : 'eager'}
+            loading={item.index > 5 ? 'lazy' : 'eager'}
             decoding="async"
           />
         </button>
@@ -30,38 +65,13 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 </section>
 
 <dialog class="lightbox" id="lightbox">
-  <button
-    class="lightbox-close"
-    type="button"
-    aria-label="Zamknij"
-  >
-    ×
-  </button>
-
-  <button
-    class="lightbox-nav lightbox-prev"
-    type="button"
-    aria-label="Poprzednie zdjęcie"
-  >
-    ‹
-  </button>
-
-  <img
-    class="lightbox-image"
-    src=""
-    alt=""
-  />
-
-  <button
-    class="lightbox-nav lightbox-next"
-    type="button"
-    aria-label="Następne zdjęcie"
-  >
-    ›
-  </button>
+  <button class="lightbox-close" type="button" aria-label="Zamknij">×</button>
+  <button class="lightbox-nav lightbox-prev" type="button" aria-label="Poprzednie zdjęcie">‹</button>
+  <img class="lightbox-image" src="" alt="" />
+  <button class="lightbox-nav lightbox-next" type="button" aria-label="Następne zdjęcie">›</button>
 </dialog>
 
-<script define:vars={{ images: gallery.images, base }}>
+<script define:vars={{ lightboxItems: items.map(({ alt, lightbox }) => ({ alt, lightbox })) }}>
   const masonry = document.querySelector('[data-masonry]');
   const source = masonry?.querySelector('[data-masonry-source]');
   const columnsHost = masonry?.querySelector('[data-masonry-columns]');
@@ -71,35 +81,16 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
   const lightboxImage = dialog?.querySelector('.lightbox-image');
 
   let current = 0;
-  let currentColumnCount = 0;
+  let currentColumns = 0;
   let resizeTimer;
 
-  const imageUrl = (src) => `${base}${src.replace(/^\//, '')}`;
-
-  const getColumnCount = () => {
+  const columnCount = () => {
     if (window.innerWidth <= 680) return 2;
     if (window.innerWidth <= 980) return 3;
     return 4;
   };
 
-  const waitForImages = async (items) => {
-    await Promise.all(
-      items.map((item) => {
-        const img = item.querySelector('img');
-
-        if (!img || img.complete) return Promise.resolve();
-
-        return new Promise((resolve) => {
-          img.addEventListener('load', resolve, { once: true });
-          img.addEventListener('error', resolve, { once: true });
-        });
-      })
-    );
-  };
-
-  const createColumns = (count) => {
-    if (!columnsHost) return [];
-
+  const buildColumns = (count) => {
     columnsHost.innerHTML = '';
     columnsHost.style.setProperty('--masonry-columns', String(count));
     columnsHost.style.setProperty('--masonry-gap', `${gap}px`);
@@ -112,108 +103,80 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     });
   };
 
-  const getShortestColumn = (columns) => {
-    return columns.reduce((shortest, column) => {
-      return column.getBoundingClientRect().height <
-        shortest.getBoundingClientRect().height
-        ? column
-        : shortest;
-    }, columns[0]);
-  };
+  /*
+   * True masonry bez czekania na pobranie zdjęć.
+   * Znamy proporcje z manifestu wygenerowanego przez Sharp,
+   * więc możemy obliczać najkrótszą kolumnę natychmiast.
+   */
+  const layout = (force = false) => {
+    if (!masonry || !source || !columnsHost) return;
 
-  const layoutMasonry = async (force = false) => {
-    if (!source || !columnsHost) return;
+    const count = columnCount();
 
-    const desiredColumnCount = getColumnCount();
+    if (!force && count === currentColumns) return;
+    currentColumns = count;
 
-    if (!force && desiredColumnCount === currentColumnCount) return;
+    const items = Array.from(masonry.querySelectorAll('.gallery-item'));
+    items.forEach((item) => source.appendChild(item));
 
-    currentColumnCount = desiredColumnCount;
-
-    const allItems = Array.from(
-      masonry.querySelectorAll('.gallery-item')
-    );
-
-    allItems.forEach((item) => source.appendChild(item));
-
-    source.hidden = false;
-
-    const items = Array.from(
-      source.querySelectorAll('.gallery-item')
-    );
-
-    await waitForImages(items);
-
-    const columns = createColumns(desiredColumnCount);
+    const columns = buildColumns(count);
+    const heights = Array(count).fill(0);
 
     for (const item of items) {
-      getShortestColumn(columns).appendChild(item);
+      const ratio = Number(item.dataset.ratio || 1);
+
+      let shortest = 0;
+      for (let i = 1; i < heights.length; i++) {
+        if (heights[i] < heights[shortest]) shortest = i;
+      }
+
+      columns[shortest].appendChild(item);
+      heights[shortest] += ratio + gap / 1000;
     }
 
     source.hidden = true;
   };
 
-  const showLightbox = (index) => {
-    if (!dialog || !lightboxImage || !images.length) return;
+  const show = (index) => {
+    if (!dialog || !lightboxImage || !lightboxItems.length) return;
 
-    current = (index + images.length) % images.length;
-
-    lightboxImage.src = imageUrl(images[current].src);
-    lightboxImage.alt = images[current].alt;
+    current = (index + lightboxItems.length) % lightboxItems.length;
+    lightboxImage.src = lightboxItems[current].lightbox;
+    lightboxImage.alt = lightboxItems[current].alt;
   };
 
   document.addEventListener('click', (event) => {
     const button = event.target.closest?.('[data-lightbox-index]');
-
     if (!button) return;
 
-    showLightbox(Number(button.dataset.lightboxIndex));
+    show(Number(button.dataset.lightboxIndex));
     dialog?.showModal();
   });
 
-  dialog
-    ?.querySelector('.lightbox-close')
-    ?.addEventListener('click', () => dialog.close());
-
-  dialog
-    ?.querySelector('.lightbox-prev')
-    ?.addEventListener('click', () => showLightbox(current - 1));
-
-  dialog
-    ?.querySelector('.lightbox-next')
-    ?.addEventListener('click', () => showLightbox(current + 1));
+  dialog?.querySelector('.lightbox-close')?.addEventListener('click', () => dialog.close());
+  dialog?.querySelector('.lightbox-prev')?.addEventListener('click', () => show(current - 1));
+  dialog?.querySelector('.lightbox-next')?.addEventListener('click', () => show(current + 1));
 
   dialog?.addEventListener('click', (event) => {
-    if (event.target === dialog) {
-      dialog.close();
-    }
+    if (event.target === dialog) dialog.close();
   });
 
   document.addEventListener('keydown', (event) => {
     if (!dialog?.open) return;
-
-    if (event.key === 'ArrowLeft') showLightbox(current - 1);
-    if (event.key === 'ArrowRight') showLightbox(current + 1);
+    if (event.key === 'ArrowLeft') show(current - 1);
+    if (event.key === 'ArrowRight') show(current + 1);
     if (event.key === 'Escape') dialog.close();
   });
 
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-
-    resizeTimer = setTimeout(() => {
-      layoutMasonry(false);
-    }, 150);
+    resizeTimer = setTimeout(() => layout(false), 140);
   });
 
-  layoutMasonry(true);
+  layout(true);
 </script>
 
 <style is:global>
-  /*
-   * Wszystkie reguły galerii są tutaj celowo.
-   * Dzięki większej specyficzności nadpisują stare reguły z global.css.
-   */
-
   .gallery-section {
     padding: 10px 0;
     background: #e5e5e5;
@@ -236,12 +199,8 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
   .true-masonry .masonry-columns {
     --masonry-columns: 4;
     --masonry-gap: 10px;
-
     display: grid;
-    grid-template-columns: repeat(
-      var(--masonry-columns),
-      minmax(0, 1fr)
-    );
+    grid-template-columns: repeat(var(--masonry-columns), minmax(0, 1fr));
     gap: var(--masonry-gap);
     align-items: start;
     width: 100%;
@@ -262,8 +221,8 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     border: 0;
     background: transparent;
     break-inside: avoid;
-    cursor: zoom-in;
     overflow: hidden;
+    cursor: zoom-in;
   }
 
   .true-masonry .masonry-column .gallery-item {
@@ -275,38 +234,24 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     width: 100%;
     height: auto;
     max-width: none;
-    border: 0;
   }
-
-  /*
-   * LIGHTBOX
-   *
-   * Ważne:
-   * zdjęcie ma jawnie określoną dostępną szerokość i wysokość,
-   * a object-fit: contain dopasowuje je bez kadrowania i bez
-   * zmiany proporcji.
-   */
 
   dialog.lightbox {
     position: fixed;
     inset: 0;
-
     width: min(96vw, 1600px);
     height: min(94dvh, 1050px);
-
     max-width: none;
     max-height: none;
-
     margin: auto;
     padding: 0;
     border: 0;
-
     overflow: hidden;
-    background: rgba(18, 18, 18, 0.98);
+    background: rgba(18, 18, 18, .98);
   }
 
   dialog.lightbox::backdrop {
-    background: rgba(0, 0, 0, 0.88);
+    background: rgba(0, 0, 0, .88);
   }
 
   dialog.lightbox[open] {
@@ -317,19 +262,14 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
   dialog.lightbox > img.lightbox-image {
     display: block;
-
     width: calc(100% - 156px);
     height: calc(100% - 48px);
-
     max-width: none;
     max-height: none;
-
     margin: 0;
     padding: 0;
-
     object-fit: contain;
     object-position: center;
-
     flex: 0 0 auto;
   }
 
@@ -337,11 +277,9 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
   dialog.lightbox > .lightbox-nav {
     position: absolute;
     z-index: 10;
-
     border: 0;
     color: #fff;
-    background: rgba(0, 0, 0, 0.36);
-
+    background: rgba(0, 0, 0, .36);
     cursor: pointer;
     user-select: none;
   }
@@ -349,33 +287,23 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
   dialog.lightbox > .lightbox-close {
     top: 14px;
     right: 18px;
-
     width: 48px;
     height: 48px;
-
     font-size: 38px;
     line-height: 1;
   }
 
   dialog.lightbox > .lightbox-nav {
     top: 50%;
-
     width: 54px;
     height: 76px;
-
     transform: translateY(-50%);
-
     font-size: 54px;
     line-height: 1;
   }
 
-  dialog.lightbox > .lightbox-prev {
-    left: 10px;
-  }
-
-  dialog.lightbox > .lightbox-next {
-    right: 10px;
-  }
+  dialog.lightbox > .lightbox-prev { left: 10px; }
+  dialog.lightbox > .lightbox-next { right: 10px; }
 
   @media (max-width: 980px) {
     .true-masonry .masonry-source {
@@ -401,22 +329,17 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
     dialog.lightbox > .lightbox-close {
       top: 8px;
       right: 8px;
-
       width: 44px;
       height: 44px;
-
       font-size: 34px;
     }
 
     dialog.lightbox > .lightbox-nav {
       top: auto;
       bottom: 12px;
-
       width: 50px;
       height: 50px;
-
       transform: none;
-
       font-size: 42px;
     }
 
