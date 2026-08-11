@@ -1,68 +1,25 @@
 ---
 import gallery from '../data/gallery.json';
-import optimizedManifest from '../data/gallery-optimized.json';
-import '../styles/masonry.css';
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
-
-const withBase = (src) => `${base}${src.replace(/^\//, '')}`;
-
-const items = gallery.images.map((item, index) => {
-  const optimized = optimizedManifest.images?.[item.src];
-
-  if (!optimized) {
-    return {
-      ...item,
-      index,
-      src: withBase(item.src),
-      srcset: undefined,
-      width: undefined,
-      height: undefined,
-      lightbox: withBase(item.src),
-    };
-  }
-
-  return {
-    ...item,
-    index,
-    src: withBase(optimized.sources['960']),
-    srcset: [
-      `${withBase(optimized.sources['480'])} 480w`,
-      `${withBase(optimized.sources['960'])} 960w`,
-      `${withBase(optimized.sources['1600'])} 1600w`,
-    ].join(', '),
-    width: optimized.width,
-    height: optimized.height,
-    lightbox: withBase(optimized.sources['1600']),
-  };
-});
 ---
 
 <section class="gallery-section" id="Galeria" aria-label="Galeria realizacji">
-  <div
-    class="masonry"
-    data-masonry
-    data-masonry-gap="10"
-  >
+  <div class="true-masonry" data-masonry data-gap="10">
     <div class="masonry-source" data-masonry-source>
-      {items.map((item) => (
+      {gallery.images.map((item, index) => (
         <button
           class="gallery-item"
           type="button"
-          data-lightbox-index={item.index}
+          data-lightbox-index={index}
           aria-label={`Otwórz zdjęcie: ${item.alt}`}
         >
           <img
-            src={item.src}
-            srcset={item.srcset}
-            sizes="(max-width: 680px) calc((100vw - 10px) / 2), (max-width: 980px) calc((100vw - 20px) / 3), calc((100vw - 30px) / 4)"
-            width={item.width}
-            height={item.height}
+            src={`${base}${item.src.replace(/^\//, '')}`}
             alt={item.alt}
-            loading={item.index > 5 ? 'lazy' : 'eager'}
+            loading={index > 5 ? 'lazy' : 'eager'}
             decoding="async"
-            fetchpriority={item.index < 4 ? 'high' : 'auto'}
           />
         </button>
       ))}
@@ -73,17 +30,42 @@ const items = gallery.images.map((item, index) => {
 </section>
 
 <dialog class="lightbox" id="lightbox">
-  <button class="lightbox-close" type="button" aria-label="Zamknij">×</button>
-  <button class="lightbox-nav lightbox-prev" type="button" aria-label="Poprzednie zdjęcie">‹</button>
-  <img class="lightbox-image" src="" alt="" />
-  <button class="lightbox-nav lightbox-next" type="button" aria-label="Następne zdjęcie">›</button>
+  <button
+    class="lightbox-close"
+    type="button"
+    aria-label="Zamknij"
+  >
+    ×
+  </button>
+
+  <button
+    class="lightbox-nav lightbox-prev"
+    type="button"
+    aria-label="Poprzednie zdjęcie"
+  >
+    ‹
+  </button>
+
+  <img
+    class="lightbox-image"
+    src=""
+    alt=""
+  />
+
+  <button
+    class="lightbox-nav lightbox-next"
+    type="button"
+    aria-label="Następne zdjęcie"
+  >
+    ›
+  </button>
 </dialog>
 
-<script define:vars={{ lightboxItems: items.map(({ alt, lightbox }) => ({ alt, lightbox })) }}>
+<script define:vars={{ images: gallery.images, base }}>
   const masonry = document.querySelector('[data-masonry]');
   const source = masonry?.querySelector('[data-masonry-source]');
   const columnsHost = masonry?.querySelector('[data-masonry-columns]');
-  const gap = Number(masonry?.dataset.masonryGap || 10);
+  const gap = Number(masonry?.dataset.gap || 10);
 
   const dialog = document.querySelector('#lightbox');
   const lightboxImage = dialog?.querySelector('.lightbox-image');
@@ -92,13 +74,30 @@ const items = gallery.images.map((item, index) => {
   let currentColumnCount = 0;
   let resizeTimer;
 
+  const imageUrl = (src) => `${base}${src.replace(/^\//, '')}`;
+
   const getColumnCount = () => {
     if (window.innerWidth <= 680) return 2;
     if (window.innerWidth <= 980) return 3;
     return 4;
   };
 
-  const makeColumns = (count) => {
+  const waitForImages = async (items) => {
+    await Promise.all(
+      items.map((item) => {
+        const img = item.querySelector('img');
+
+        if (!img || img.complete) return Promise.resolve();
+
+        return new Promise((resolve) => {
+          img.addEventListener('load', resolve, { once: true });
+          img.addEventListener('error', resolve, { once: true });
+        });
+      })
+    );
+  };
+
+  const createColumns = (count) => {
     if (!columnsHost) return [];
 
     columnsHost.innerHTML = '';
@@ -113,43 +112,54 @@ const items = gallery.images.map((item, index) => {
     });
   };
 
-  const shortestColumn = (columns) => {
+  const getShortestColumn = (columns) => {
     return columns.reduce((shortest, column) => {
-      return column.offsetHeight < shortest.offsetHeight ? column : shortest;
+      return column.getBoundingClientRect().height <
+        shortest.getBoundingClientRect().height
+        ? column
+        : shortest;
     }, columns[0]);
   };
 
-  const layoutMasonry = (force = false) => {
+  const layoutMasonry = async (force = false) => {
     if (!source || !columnsHost) return;
 
-    const desiredColumns = getColumnCount();
+    const desiredColumnCount = getColumnCount();
 
-    if (!force && desiredColumns === currentColumnCount) return;
-    currentColumnCount = desiredColumns;
+    if (!force && desiredColumnCount === currentColumnCount) return;
 
-    const existingItems = Array.from(
+    currentColumnCount = desiredColumnCount;
+
+    const allItems = Array.from(
       masonry.querySelectorAll('.gallery-item')
     );
 
-    existingItems.forEach((item) => source.appendChild(item));
+    allItems.forEach((item) => source.appendChild(item));
 
-    const columns = makeColumns(desiredColumns);
-    const items = Array.from(source.querySelectorAll('.gallery-item'));
+    source.hidden = false;
 
-    items.forEach((item) => {
-      shortestColumn(columns).appendChild(item);
-    });
+    const items = Array.from(
+      source.querySelectorAll('.gallery-item')
+    );
+
+    await waitForImages(items);
+
+    const columns = createColumns(desiredColumnCount);
+
+    for (const item of items) {
+      getShortestColumn(columns).appendChild(item);
+    }
 
     source.hidden = true;
   };
 
   const showLightbox = (index) => {
-    if (!dialog || !lightboxImage || !lightboxItems.length) return;
+    if (!dialog || !lightboxImage || !images.length) return;
 
-    current = (index + lightboxItems.length) % lightboxItems.length;
+    current = (index + images.length) % images.length;
 
-    lightboxImage.src = lightboxItems[current].lightbox;
-    lightboxImage.alt = lightboxItems[current].alt;
+    lightboxImage.src = imageUrl(images[current].src);
+    lightboxImage.alt = images[current].alt;
   };
 
   document.addEventListener('click', (event) => {
@@ -161,12 +171,22 @@ const items = gallery.images.map((item, index) => {
     dialog?.showModal();
   });
 
-  dialog?.querySelector('.lightbox-close')?.addEventListener('click', () => dialog.close());
-  dialog?.querySelector('.lightbox-prev')?.addEventListener('click', () => showLightbox(current - 1));
-  dialog?.querySelector('.lightbox-next')?.addEventListener('click', () => showLightbox(current + 1));
+  dialog
+    ?.querySelector('.lightbox-close')
+    ?.addEventListener('click', () => dialog.close());
+
+  dialog
+    ?.querySelector('.lightbox-prev')
+    ?.addEventListener('click', () => showLightbox(current - 1));
+
+  dialog
+    ?.querySelector('.lightbox-next')
+    ?.addEventListener('click', () => showLightbox(current + 1));
 
   dialog?.addEventListener('click', (event) => {
-    if (event.target === dialog) dialog.close();
+    if (event.target === dialog) {
+      dialog.close();
+    }
   });
 
   document.addEventListener('keydown', (event) => {
@@ -179,8 +199,233 @@ const items = gallery.images.map((item, index) => {
 
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => layoutMasonry(false), 140);
+
+    resizeTimer = setTimeout(() => {
+      layoutMasonry(false);
+    }, 150);
   });
 
   layoutMasonry(true);
 </script>
+
+<style is:global>
+  /*
+   * Wszystkie reguły galerii są tutaj celowo.
+   * Dzięki większej specyficzności nadpisują stare reguły z global.css.
+   */
+
+  .gallery-section {
+    padding: 10px 0;
+    background: #e5e5e5;
+  }
+
+  .true-masonry {
+    width: 100%;
+  }
+
+  .true-masonry .masonry-source {
+    width: 100%;
+    column-count: 4;
+    column-gap: 10px;
+  }
+
+  .true-masonry .masonry-source[hidden] {
+    display: none;
+  }
+
+  .true-masonry .masonry-columns {
+    --masonry-columns: 4;
+    --masonry-gap: 10px;
+
+    display: grid;
+    grid-template-columns: repeat(
+      var(--masonry-columns),
+      minmax(0, 1fr)
+    );
+    gap: var(--masonry-gap);
+    align-items: start;
+    width: 100%;
+  }
+
+  .true-masonry .masonry-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--masonry-gap);
+    min-width: 0;
+  }
+
+  .true-masonry .gallery-item {
+    display: block;
+    width: 100%;
+    margin: 0 0 10px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    break-inside: avoid;
+    cursor: zoom-in;
+    overflow: hidden;
+  }
+
+  .true-masonry .masonry-column .gallery-item {
+    margin-bottom: 0;
+  }
+
+  .true-masonry .gallery-item img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: none;
+    border: 0;
+  }
+
+  /*
+   * LIGHTBOX
+   *
+   * Ważne:
+   * zdjęcie ma jawnie określoną dostępną szerokość i wysokość,
+   * a object-fit: contain dopasowuje je bez kadrowania i bez
+   * zmiany proporcji.
+   */
+
+  dialog.lightbox {
+    position: fixed;
+    inset: 0;
+
+    width: min(96vw, 1600px);
+    height: min(94dvh, 1050px);
+
+    max-width: none;
+    max-height: none;
+
+    margin: auto;
+    padding: 0;
+    border: 0;
+
+    overflow: hidden;
+    background: rgba(18, 18, 18, 0.98);
+  }
+
+  dialog.lightbox::backdrop {
+    background: rgba(0, 0, 0, 0.88);
+  }
+
+  dialog.lightbox[open] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  dialog.lightbox > img.lightbox-image {
+    display: block;
+
+    width: calc(100% - 156px);
+    height: calc(100% - 48px);
+
+    max-width: none;
+    max-height: none;
+
+    margin: 0;
+    padding: 0;
+
+    object-fit: contain;
+    object-position: center;
+
+    flex: 0 0 auto;
+  }
+
+  dialog.lightbox > .lightbox-close,
+  dialog.lightbox > .lightbox-nav {
+    position: absolute;
+    z-index: 10;
+
+    border: 0;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.36);
+
+    cursor: pointer;
+    user-select: none;
+  }
+
+  dialog.lightbox > .lightbox-close {
+    top: 14px;
+    right: 18px;
+
+    width: 48px;
+    height: 48px;
+
+    font-size: 38px;
+    line-height: 1;
+  }
+
+  dialog.lightbox > .lightbox-nav {
+    top: 50%;
+
+    width: 54px;
+    height: 76px;
+
+    transform: translateY(-50%);
+
+    font-size: 54px;
+    line-height: 1;
+  }
+
+  dialog.lightbox > .lightbox-prev {
+    left: 10px;
+  }
+
+  dialog.lightbox > .lightbox-next {
+    right: 10px;
+  }
+
+  @media (max-width: 980px) {
+    .true-masonry .masonry-source {
+      column-count: 3;
+    }
+  }
+
+  @media (max-width: 680px) {
+    .true-masonry .masonry-source {
+      column-count: 2;
+    }
+
+    dialog.lightbox {
+      width: 100vw;
+      height: 100dvh;
+    }
+
+    dialog.lightbox > img.lightbox-image {
+      width: calc(100% - 20px);
+      height: calc(100% - 116px);
+    }
+
+    dialog.lightbox > .lightbox-close {
+      top: 8px;
+      right: 8px;
+
+      width: 44px;
+      height: 44px;
+
+      font-size: 34px;
+    }
+
+    dialog.lightbox > .lightbox-nav {
+      top: auto;
+      bottom: 12px;
+
+      width: 50px;
+      height: 50px;
+
+      transform: none;
+
+      font-size: 42px;
+    }
+
+    dialog.lightbox > .lightbox-prev {
+      left: calc(50% - 62px);
+    }
+
+    dialog.lightbox > .lightbox-next {
+      right: calc(50% - 62px);
+    }
+  }
+</style>
