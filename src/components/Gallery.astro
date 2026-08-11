@@ -1,61 +1,191 @@
 ---
 import gallery from '../data/gallery.json';
+import '../styles/masonry.css';
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 ---
 
 <section class="gallery-section" id="Galeria" aria-label="Galeria realizacji">
-  <div class="gallery-masonry">
-    {gallery.images.map((item, index) => (
-      <button
-        class="gallery-item"
-        type="button"
-        data-lightbox-index={index}
-        aria-label={`Otwórz zdjęcie: ${item.alt}`}
-      >
-        <img
-          src={`${base}${item.src.replace(/^\//, '')}`}
-          alt={item.alt}
-          loading={index > 5 ? 'lazy' : 'eager'}
-          decoding="async"
-        />
-      </button>
-    ))}
+  <div
+    class="masonry"
+    data-masonry
+    data-masonry-gap="10"
+    aria-live="off"
+  >
+    <div class="masonry-source" data-masonry-source>
+      {gallery.images.map((item, index) => (
+        <button
+          class="gallery-item"
+          type="button"
+          data-lightbox-index={index}
+          aria-label={`Otwórz zdjęcie: ${item.alt}`}
+        >
+          <img
+            src={`${base}${item.src.replace(/^\//, '')}`}
+            alt={item.alt}
+            loading={index > 5 ? 'lazy' : 'eager'}
+            decoding="async"
+          />
+        </button>
+      ))}
+    </div>
+
+    <div class="masonry-columns" data-masonry-columns></div>
   </div>
 </section>
 
 <dialog class="lightbox" id="lightbox">
-  <button class="lightbox-close" type="button" aria-label="Zamknij">×</button>
-  <button class="lightbox-nav lightbox-prev" type="button" aria-label="Poprzednie zdjęcie">‹</button>
-  <img class="lightbox-image" src="" alt="" />
-  <button class="lightbox-nav lightbox-next" type="button" aria-label="Następne zdjęcie">›</button>
+  <button
+    class="lightbox-close"
+    type="button"
+    aria-label="Zamknij"
+  >
+    ×
+  </button>
+
+  <button
+    class="lightbox-nav lightbox-prev"
+    type="button"
+    aria-label="Poprzednie zdjęcie"
+  >
+    ‹
+  </button>
+
+  <img
+    class="lightbox-image"
+    src=""
+    alt=""
+  />
+
+  <button
+    class="lightbox-nav lightbox-next"
+    type="button"
+    aria-label="Następne zdjęcie"
+  >
+    ›
+  </button>
 </dialog>
 
 <script define:vars={{ images: gallery.images, base }}>
+  const masonry = document.querySelector('[data-masonry]');
+  const source = masonry?.querySelector('[data-masonry-source]');
+  const columnsHost = masonry?.querySelector('[data-masonry-columns]');
+  const gap = Number(masonry?.dataset.masonryGap || 10);
+
   const dialog = document.querySelector('#lightbox');
-  const image = dialog?.querySelector('.lightbox-image');
+  const lightboxImage = dialog?.querySelector('.lightbox-image');
+
   let current = 0;
+  let currentColumnCount = 0;
+  let resizeTimer;
 
   const imageUrl = (src) => `${base}${src.replace(/^\//, '')}`;
 
-  const show = (index) => {
-    if (!dialog || !image || !images.length) return;
-    current = (index + images.length) % images.length;
-    image.src = imageUrl(images[current].src);
-    image.alt = images[current].alt;
+  const getColumnCount = () => {
+    const width = window.innerWidth;
+
+    if (width <= 680) return 2;
+    if (width <= 980) return 3;
+    return 4;
   };
 
-  document.querySelectorAll('[data-lightbox-index]').forEach((button) => {
-    button.addEventListener('click', () => {
-      show(Number(button.dataset.lightboxIndex));
-      dialog?.showModal();
+  const waitForImages = async (items) => {
+    await Promise.all(
+      items.map((item) => {
+        const img = item.querySelector('img');
+
+        if (!img || img.complete) return Promise.resolve();
+
+        return new Promise((resolve) => {
+          img.addEventListener('load', resolve, { once: true });
+          img.addEventListener('error', resolve, { once: true });
+        });
+      })
+    );
+  };
+
+  const makeColumns = (count) => {
+    if (!columnsHost) return [];
+
+    columnsHost.innerHTML = '';
+    columnsHost.style.setProperty('--masonry-columns', String(count));
+    columnsHost.style.setProperty('--masonry-gap', `${gap}px`);
+
+    return Array.from({ length: count }, () => {
+      const column = document.createElement('div');
+      column.className = 'masonry-column';
+      columnsHost.appendChild(column);
+      return column;
     });
+  };
+
+  const shortestColumn = (columns) => {
+    return columns.reduce((shortest, column) => {
+      return column.offsetHeight < shortest.offsetHeight ? column : shortest;
+    }, columns[0]);
+  };
+
+  const layoutMasonry = async (force = false) => {
+    if (!source || !columnsHost) return;
+
+    const desiredColumns = getColumnCount();
+
+    if (!force && desiredColumns === currentColumnCount) return;
+    currentColumnCount = desiredColumns;
+
+    const existingItems = Array.from(
+      masonry.querySelectorAll('.gallery-item')
+    );
+
+    existingItems.forEach((item) => source.appendChild(item));
+
+    const items = Array.from(
+      source.querySelectorAll('.gallery-item')
+    );
+
+    const columns = makeColumns(desiredColumns);
+
+    source.hidden = false;
+
+    await waitForImages(items);
+
+    items.forEach((item) => {
+      const target = shortestColumn(columns);
+      target.appendChild(item);
+    });
+
+    source.hidden = true;
+  };
+
+  const showLightbox = (index) => {
+    if (!dialog || !lightboxImage || !images.length) return;
+
+    current = (index + images.length) % images.length;
+    lightboxImage.src = imageUrl(images[current].src);
+    lightboxImage.alt = images[current].alt;
+  };
+
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest?.('[data-lightbox-index]');
+
+    if (button) {
+      showLightbox(Number(button.dataset.lightboxIndex));
+      dialog?.showModal();
+    }
   });
 
-  dialog?.querySelector('.lightbox-close')?.addEventListener('click', () => dialog.close());
-  dialog?.querySelector('.lightbox-prev')?.addEventListener('click', () => show(current - 1));
-  dialog?.querySelector('.lightbox-next')?.addEventListener('click', () => show(current + 1));
+  dialog
+    ?.querySelector('.lightbox-close')
+    ?.addEventListener('click', () => dialog.close());
+
+  dialog
+    ?.querySelector('.lightbox-prev')
+    ?.addEventListener('click', () => showLightbox(current - 1));
+
+  dialog
+    ?.querySelector('.lightbox-next')
+    ?.addEventListener('click', () => showLightbox(current + 1));
 
   dialog?.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
@@ -63,8 +193,20 @@ const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
 
   document.addEventListener('keydown', (event) => {
     if (!dialog?.open) return;
-    if (event.key === 'ArrowLeft') show(current - 1);
-    if (event.key === 'ArrowRight') show(current + 1);
+
+    if (event.key === 'ArrowLeft') showLightbox(current - 1);
+    if (event.key === 'ArrowRight') showLightbox(current + 1);
     if (event.key === 'Escape') dialog.close();
   });
+
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => layoutMasonry(false), 140);
+  });
+
+  window.addEventListener('load', () => layoutMasonry(true), { once: true });
+
+  if (document.readyState === 'complete') {
+    layoutMasonry(true);
+  }
 </script>

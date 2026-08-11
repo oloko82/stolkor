@@ -1,0 +1,130 @@
+
+/*
+ * Prawdziwy masonry dla Stolkor.
+ * Każde kolejne zdjęcie jest umieszczane przez JS w aktualnie najkrótszej kolumnie.
+ */
+
+.gallery-section {
+  padding: 10px 0;
+  background: #E5E5E5;
+}
+
+.masonry {
+  width: 100%;
+}
+
+.masonry-source {
+  width: 100%;
+}
+
+.masonry-source[hidden] {
+  display: none;
+}
+
+.masonry-columns {
+  --masonry-columns: 4;
+  --masonry-gap: 10px;
+
+  display: grid;
+  grid-template-columns: repeat(var(--masonry-columns), minmax(0, 1fr));
+  gap: var(--masonry-gap);
+  align-items: start;
+  width: 100%;
+}
+
+.masonry-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--masonry-gap);
+  min-width: 0;
+}
+
+.gallery-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.gallery-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Lightbox */
+.lightbox {
+  width: min(94vw, 1500px);
+  max-width: none;
+  height: min(92vh, 1000px);
+  padding: 0;
+  border: 0;
+  background: rgba(18, 18, 18, .98);
+  overflow: hidden;
+}
+
+.lightbox::backdrop {
+  background: rgba(0, 0, 0, .86);
+}
+
+.lightbox[open] {
+  display: grid;
+  place-items: center;
+}
+
+.lightbox-image {
+  max-width: 91%;
+  max-height: 88%;
+  object-fit: contain;
+}
+
+.lightbox-close,
+.lightbox-nav {
+  position: absolute;
+  z-index: 2;
+  border: 0;
+  color: #fff;
+  background: rgba(0, 0, 0, .3);
+  cursor: pointer;
+}
+
+.lightbox-close {
+  top: 14px;
+  right: 18px;
+  width: 48px;
+  height: 48px;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.lightbox-nav {
+  top: 50%;
+  width: 54px;
+  height: 76px;
+  transform: translateY(-50%);
+  font-size: 54px;
+}
+
+.lightbox-prev {
+  left: 10px;
+}
+
+.lightbox-next {
+  right: 10px;
+}
+
+@media (max-width: 680px) {
+  .gallery-section {
+    padding-block: 10px;
+  }
+
+  .lightbox-nav {
+    width: 44px;
+    height: 66px;
+    font-size: 44px;
+  }
+}
