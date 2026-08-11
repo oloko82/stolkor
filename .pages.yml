@@ -1,3 +1,14 @@
+actions:
+  - name: publish-site
+    label: Publikuj stronę
+    workflow: deploy.yml
+    ref: current
+    cancelable: true
+    confirm:
+      title: Opublikować stronę?
+      message: Wszystkie zapisane zmiany zostaną zbudowane i opublikowane na stolkor.pl.
+      button: Publikuj
+
 media:
   input: public/images/gallery
   output: /images/gallery
