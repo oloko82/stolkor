@@ -1,0 +1,10 @@
+{
+  "images": [
+    { "src": "/images/gallery/realizacja-01.svg", "alt": "Realizacja stolarska Stolkor 1" },
+    { "src": "/images/gallery/realizacja-02.svg", "alt": "Realizacja stolarska Stolkor 2" },
+    { "src": "/images/gallery/realizacja-03.svg", "alt": "Realizacja stolarska Stolkor 3" },
+    { "src": "/images/gallery/realizacja-04.svg", "alt": "Realizacja stolarska Stolkor 4" },
+    { "src": "/images/gallery/realizacja-05.svg", "alt": "Realizacja stolarska Stolkor 5" },
+    { "src": "/images/gallery/realizacja-06.svg", "alt": "Realizacja stolarska Stolkor 6" }
+  ]
+}

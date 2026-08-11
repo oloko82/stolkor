@@ -1,0 +1,73 @@
+---
+import Gallery from '../components/Gallery.astro';
+import site from '../data/site.json';
+import '../styles/global.css';
+const tel = (value) => `tel:${value.replace(/\s/g, '')}`;
+const year = new Date().getFullYear();
+---
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="description" content={site.description} />
+    <meta name="theme-color" content="#f4f2ee" />
+    <title>{site.title}</title>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="hero-overlay"></div>
+      <nav class="nav shell" aria-label="Główna nawigacja">
+        <a href="#start" class="brand" aria-label="Stolkor – początek strony">
+          <img src="/images/logo.webp" alt="Stolkor" width="180" height="143" />
+        </a>
+        <div class="nav-links">
+          <a href="#o-nas">O nas</a>
+          <a href="#realizacje">Realizacje</a>
+          <a href="#kontakt">Kontakt</a>
+        </div>
+      </nav>
+      <div class="hero-content shell" id="start">
+        <p class="eyebrow light">Stolkor</p>
+        <h1>Meble tworzone<br />z charakterem.</h1>
+        <a class="button" href="#kontakt">Skontaktuj się z nami</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="about shell" id="o-nas">
+        <div class="about-copy">
+          <p class="eyebrow">O firmie</p>
+          <h2>Rzemiosło, jakość i minimalizm</h2>
+          <p>{site.intro}</p>
+        </div>
+        <div class="stats" aria-label="Najważniejsze liczby">
+          <div><strong>{site.experience}</strong><span>Lat doświadczenia</span></div>
+          <div><strong>{site.customers}</strong><span>Zadowolonych klientów</span></div>
+        </div>
+      </section>
+
+      <div class="shell"><Gallery /></div>
+
+      <section class="contact" id="kontakt">
+        <div class="shell contact-grid">
+          <div>
+            <p class="eyebrow light">Kontakt</p>
+            <h2>Skontaktuj się z nami</h2>
+            <p>{site.contactText}</p>
+          </div>
+          <address>
+            <strong>{site.company}</strong>
+            <a href={tel(site.phoneFurniture)}>{site.phoneFurniture} <span>– {site.phoneFurnitureLabel}</span></a>
+            <a href={tel(site.phoneJoinery)}>{site.phoneJoinery} <span>– {site.phoneJoineryLabel}</span></a>
+          </address>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer shell">
+      <span>© 2010–{year} {site.copyright}</span>
+      <a href="#start">Do góry ↑</a>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Miejsce na zdjęcie realizacji 01">
+  <rect width="1200" height="800" fill="#e7e4df"/>
+  <path d="M0 620 250 390l190 160 250-270 510 420v100H0z" fill="#cbc6be"/>
+  <circle cx="910" cy="220" r="90" fill="#d7d2ca"/>
+  <text x="600" y="730" text-anchor="middle" font-family="Arial, sans-serif" font-size="34" fill="#6f6b65">Zdjęcie realizacji 01</text>
+</svg>
