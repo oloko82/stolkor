@@ -1,0 +1,40 @@
+
+/*
+ * STOLKOR — minimalistyczne menu
+ * Tylko tekst, bez strzałek.
+ * Plik ładowany po polish.css, więc nie zmienia geometrii nagłówka.
+ */
+
+.site-header .main-nav {
+  gap: 34px;
+}
+
+.site-header .main-nav a {
+  gap: 0;
+  font-weight: 500;
+}
+
+/* Linia zaczyna się bezpośrednio pod tekstem. */
+.site-header .main-nav a::after {
+  left: 0;
+  right: 0;
+  bottom: -5px;
+}
+
+/* Stare strzałki nie są już w HTML, ale ta reguła zabezpiecza
+   przed ich przypadkowym pojawieniem się po merge/rebase. */
+.site-header .main-nav a > span {
+  display: none !important;
+}
+
+@media (max-width: 980px) {
+  .site-header .main-nav {
+    gap: 30px;
+  }
+}
+
+@media (max-width: 680px) {
+  .site-header .main-nav {
+    gap: 26px;
+  }
+}
