@@ -23,6 +23,41 @@ content:
       - { name: contactText, label: Tekst kontaktowy, type: text }
       - { name: copyright, label: Nazwa w stopce, type: string }
 
+      - name: fontMenu
+        label: "Rozmiar menu (px)"
+        type: string
+        default: "20"
+
+      - name: fontAbout
+        label: "Rozmiar tekstu o firmie (px)"
+        type: string
+        default: "30"
+
+      - name: fontStats
+        label: "Rozmiar dużych liczb 10+ / 657+ (px)"
+        type: string
+        default: "68"
+
+      - name: fontStatsLabel
+        label: "Rozmiar podpisów pod statystykami (px)"
+        type: string
+        default: "16"
+
+      - name: fontContactTitle
+        label: "Rozmiar tytułu „Skontaktuj się z nami” (px)"
+        type: string
+        default: "42"
+
+      - name: fontContact
+        label: "Rozmiar danych kontaktowych (px)"
+        type: string
+        default: "18"
+
+      - name: fontFooter
+        label: "Rozmiar tekstu w stopce (px)"
+        type: string
+        default: "14"
+
   - name: gallery
     label: Galeria
     type: file

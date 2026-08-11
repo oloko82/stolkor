@@ -14,13 +14,30 @@ const introParagraphs = Array.isArray(site.intro)
   : [site.intro].filter(Boolean);
 
 const defaultMapEmbed =
-  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2507.9122663555568!2d15.68809381571674!3d51.054707751521406!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x470f24197deba825%3A0xaed33a3c5b79b973!2sPrze%C5%BAdziedza%201%2C%2059-610%20Prze%C5%BAdziedza!5e0!3m2!1spl!2spl!4v1627841523398!5m2!1spl!2spl';
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2507.9122663555568!2d15.68809381571674!3d51.054707751521406!2m3!1f0!2f0!3f0!2m3!1i1024!2i768!4f13.1!3m3!1m2!1s0x470f24197deba825%3A0xaed33a3c5b79b973!2sPrze%C5%BAdziedza%201%2C%2059-610%20Prze%C5%BAdziedza!5e0!3m2!1spl!2spl!4v1627841523398!5m2!1spl!2spl';
 
 const mapEmbed = site.mapEmbed || defaultMapEmbed;
+
+const font = (value, fallback) => {
+  const parsed = Number.parseFloat(String(value));
+  return Number.isFinite(parsed) && parsed >= 8 && parsed <= 120
+    ? `${parsed}px`
+    : `${fallback}px`;
+};
+
+const typographyStyle = [
+  `--font-menu:${font(site.fontMenu, 20)}`,
+  `--font-about:${font(site.fontAbout, 30)}`,
+  `--font-stats:${font(site.fontStats, 68)}`,
+  `--font-stats-label:${font(site.fontStatsLabel, 16)}`,
+  `--font-contact-title:${font(site.fontContactTitle, 42)}`,
+  `--font-contact:${font(site.fontContact, 18)}`,
+  `--font-footer:${font(site.fontFooter, 14)}`
+].join(';');
 ---
 
 <!doctype html>
-<html lang="pl">
+<html lang="pl" style={typographyStyle}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -33,23 +50,12 @@ const mapEmbed = site.mapEmbed || defaultMapEmbed;
     <header class="site-header">
       <div class="shell header-row">
         <a class="brand" href="#Start" aria-label="Stolkor – początek strony">
-          <img
-            src={`${base}images/logo.webp`}
-            alt="Stolkor"
-            width="240"
-          />
+          <img src={`${base}images/logo.webp`} alt="Stolkor" width="240" />
         </a>
 
         <nav class="main-nav" aria-label="Główna nawigacja">
-          <a href="#Galeria">
-            <span aria-hidden="true">›</span>
-            Galeria
-          </a>
-
-          <a href="#Kontakt">
-            <span aria-hidden="true">›</span>
-            Kontakt
-          </a>
+          <a href="#Galeria"><span aria-hidden="true">›</span>Galeria</a>
+          <a href="#Kontakt"><span aria-hidden="true">›</span>Kontakt</a>
         </nav>
       </div>
 
@@ -60,9 +66,7 @@ const mapEmbed = site.mapEmbed || defaultMapEmbed;
       <section class="about-section">
         <div class="shell about-grid">
           <div class="about-copy">
-            {introParagraphs.map((paragraph) => (
-              <p>{paragraph}</p>
-            ))}
+            {introParagraphs.map((paragraph) => <p>{paragraph}</p>)}
           </div>
 
           <div class="stat">

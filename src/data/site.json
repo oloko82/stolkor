@@ -10,5 +10,12 @@
   "phoneJoinery": "+48 696 017 661",
   "phoneJoineryLabel": "schody, drzwi",
   "contactText": "Zachęcamy do kontaktu. Odpowiemy najszybciej jak możemy.",
-  "copyright": "stolkor.pl"
+  "copyright": "stolkor.pl",
+  "fontMenu": "20",
+  "fontAbout": "30",
+  "fontStats": "68",
+  "fontStatsLabel": "16",
+  "fontContactTitle": "42",
+  "fontContact": "18",
+  "fontFooter": "14"
 }
