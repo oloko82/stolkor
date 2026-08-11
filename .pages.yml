@@ -1,12 +1,7 @@
 media:
   input: public/images/gallery
   output: /images/gallery
-  extensions:
-    - jpg
-    - jpeg
-    - png
-    - webp
-    - avif
+  extensions: [jpg, jpeg, png, webp, avif]
 
 content:
   - name: site
@@ -18,10 +13,7 @@ content:
       - { name: company, label: Nazwa firmy, type: string }
       - { name: title, label: Tytuł strony, type: string }
       - { name: description, label: Opis dla Google, type: text }
-      - name: intro
-        label: Tekst o firmie
-        type: string
-        list: true
+      - { name: intro, label: Tekst o firmie, type: text }
       - { name: experience, label: Lata doświadczenia, type: string }
       - { name: customers, label: Zadowoleni klienci, type: string }
       - { name: phoneFurniture, label: Telefon – meble i kuchnie, type: string }

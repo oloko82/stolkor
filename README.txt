@@ -1,27 +1,26 @@
-STOLKOR – poprawiona dolna część strony
+STOLKOR – synchronizacja z eksportem Dorik
 
-Paczka zawiera:
+Nadpisuje:
 - src/pages/index.astro
-- src/styles/contact.css
+- src/styles/global.css
+- src/data/site.json
+- .pages.yml
 
-Jak zastosować:
-1. Rozpakuj paczkę do głównego katalogu repozytorium `stolkor`.
-2. Pozwól nadpisać `src/pages/index.astro`.
-3. Plik `src/styles/contact.css` zostanie dodany jako nowy.
-4. Uruchom:
-   npm run dev
-5. Sprawdź sekcję kontaktową lokalnie.
-6. Jeśli jest OK:
-   npm run build
-   git add .
-   git commit -m "Improve contact section"
-   git push
+Nie nadpisuje:
+- src/data/gallery.json
+- src/components/Gallery.astro
+- public/images/gallery
 
-Zmiany:
-- smuklejsze warstwowe przejście nad kontaktem,
-- mniejszy nagłówek,
-- mapa w proporcjach bliższych Dorik,
-- prawdziwe ikony SVG zamiast znaków tekstowych,
-- lepsze odstępy i układ danych kontaktowych,
-- subtelniejsza stopka,
-- poprawiona wersja mobilna.
+Czyli zachowujesz 27 zdjęć i działający lightbox.
+
+Po rozpakowaniu:
+npm run dev
+
+Jeśli OK:
+npm run build
+git add .
+git commit -m "Synchronize layout with Dorik export"
+git pull --rebase origin main
+git push origin main
+
+Na czas pull/push nie zapisuj nic w Pages CMS.
