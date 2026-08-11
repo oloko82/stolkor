@@ -1,40 +1,91 @@
 media:
   input: public/images/gallery
   output: /images/gallery
+  extensions:
+    - jpg
+    - jpeg
+    - png
+    - webp
+    - avif
 
 content:
   - name: site
     label: Dane strony
     type: file
     path: src/data/site.json
+    format: json
+
     fields:
-      - { name: company, label: Nazwa firmy, type: string }
-      - { name: title, label: Tytuł strony, type: string }
-      - { name: description, label: Opis dla Google, type: text }
-      - { name: intro, label: Tekst o firmie, type: text }
-      - { name: experience, label: Lata doświadczenia, type: string }
-      - { name: customers, label: Zadowoleni klienci, type: string }
-      - { name: phoneFurniture, label: Telefon – meble i kuchnie, type: string }
-      - { name: phoneFurnitureLabel, label: Opis pierwszego telefonu, type: string }
-      - { name: phoneJoinery, label: Telefon – schody i drzwi, type: string }
-      - { name: phoneJoineryLabel, label: Opis drugiego telefonu, type: string }
-      - { name: contactText, label: Tekst kontaktowy, type: text }
-      - { name: copyright, label: Nazwa w stopce, type: string }
+      - name: company
+        label: Nazwa firmy
+        type: string
+
+      - name: title
+        label: Tytuł strony
+        type: string
+
+      - name: description
+        label: Opis dla Google
+        type: text
+
+      - name: intro
+        label: Tekst o firmie
+        type: text
+
+      - name: experience
+        label: Lata doświadczenia
+        type: string
+
+      - name: customers
+        label: Zadowoleni klienci
+        type: string
+
+      - name: phoneFurniture
+        label: Telefon – meble i kuchnie
+        type: string
+
+      - name: phoneFurnitureLabel
+        label: Opis pierwszego telefonu
+        type: string
+
+      - name: phoneJoinery
+        label: Telefon – schody i drzwi
+        type: string
+
+      - name: phoneJoineryLabel
+        label: Opis drugiego telefonu
+        type: string
+
+      - name: contactText
+        label: Tekst kontaktowy
+        type: text
+
+      - name: copyright
+        label: Nazwa w stopce
+        type: string
 
   - name: gallery
     label: Galeria
     type: file
     path: src/data/gallery.json
+    format: json
+
     fields:
       - name: images
         label: Zdjęcia
         type: object
-        list: true
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{alt}"
         fields:
-          - { name: src, label: Plik zdjęcia, type: image }
-          - { name: alt, label: Opis zdjęcia, type: string }
+          - name: src
+            label: Plik zdjęcia
+            type: image
+            required: true
 
-settings:
-  hide: true
-  commit:
-    message: "Aktualizacja treści przez Pages CMS"
+          - name: alt
+            label: Opis zdjęcia
+            type: string
+            required: true
+            description: Krótki opis zdjęcia używany m.in. przez Google i czytniki ekranu.
