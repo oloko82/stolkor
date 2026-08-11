@@ -1,0 +1,835 @@
+
+/*
+ * STOLKOR — Visual polish
+ * Zaakceptowany Header Geometry v2 + Contact Match v2
+ */
+
+/* =========================================================
+   PODSTAWY
+========================================================= */
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #26c281;
+  outline-offset: 4px;
+}
+
+/* =========================================================
+   HEADER — BEZ ZMIAN (zaakceptowana wersja)
+========================================================= */
+
+.site-header {
+  position: relative;
+  z-index: 2;
+  min-height: 485px;
+  height: 485px;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+.site-header::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: #e5e5e5;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% 100%,
+    50% 57.7%,
+    0 100%
+  );
+}
+
+.header-frame {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: #f4f4f4;
+  clip-path: polygon(
+    0 100%,
+    50% 57.7%,
+    100% 100%
+  );
+}
+
+.header-frame::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fafafa;
+  clip-path: polygon(
+    0 100%,
+    50% 66.4%,
+    100% 100%
+  );
+}
+
+.header-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  clip-path: polygon(
+    0 100%,
+    50% 73.5%,
+    100% 100%
+  );
+}
+
+.site-header .header-row {
+  position: relative;
+  z-index: 5;
+  width: min(1488px, calc(100% - 64px));
+  max-width: 1488px;
+  min-height: 280px;
+  margin-inline: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+}
+
+.site-header .brand {
+  display: block;
+  width: 250px;
+  margin-top: 29px;
+  margin-left: 0;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.site-header .brand img {
+  display: block;
+  width: 250px;
+  height: auto;
+}
+
+.site-header .brand:hover {
+  opacity: .9;
+}
+
+.site-header .main-nav {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 24px;
+  padding-top: 40px;
+  padding-right: 22px;
+}
+
+.site-header .main-nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  color: #211919;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 400;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.site-header .main-nav a > span {
+  position: relative;
+  top: -1px;
+  display: inline-block;
+  color: #211919;
+  font-size: 31px;
+  line-height: 20px;
+  font-weight: 300;
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.site-header .main-nav a::after {
+  content: "";
+  position: absolute;
+  left: 24px;
+  right: 0;
+  bottom: -4px;
+  height: 1px;
+  background: #26c281;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.site-header .main-nav a:hover::after {
+  transform: scaleX(1);
+}
+
+.site-header .main-nav a:hover > span {
+  color: #26c281;
+  transform: translateX(2px);
+}
+
+/* =========================================================
+   O NAS / GALERIA
+========================================================= */
+
+.about-section {
+  position: relative;
+  z-index: 1;
+  background: #ffffff;
+}
+
+.about-copy {
+  text-wrap: pretty;
+}
+
+.about-copy p {
+  margin: 0;
+}
+
+.stat {
+  padding-top: 2px;
+}
+
+.stat strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.stat span {
+  max-width: 160px;
+}
+
+.gallery-section {
+  position: relative;
+}
+
+.true-masonry .gallery-item img,
+.gallery-masonry .gallery-item img {
+  transition:
+    transform 260ms ease,
+    filter 260ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .true-masonry .gallery-item:hover img,
+  .gallery-masonry .gallery-item:hover img {
+    transform: scale(1.012);
+    filter: brightness(.96);
+  }
+}
+
+/* =========================================================
+   KONTAKT — V2
+========================================================= */
+
+/*
+ * Cała powierzchnia poza czarnym wielokątem ma kolor
+ * z oryginalnego Dorik: #666777.
+ */
+.contact-section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+
+  min-height: 900px;
+
+  padding: 0 0 88px;
+
+  background: #666777 !important;
+}
+
+/*
+ * Stary element V z DOM wyłączamy.
+ * Nowe tło rysują pseudo-elementy sekcji — dzięki temu
+ * można zrobić również skos na DOLE, tak jak we wzorze.
+ */
+.contact-frame {
+  display: none !important;
+}
+
+/*
+ * Warstwa pośrednia pod ciemnym wielokątem.
+ */
+.contact-section::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+
+  background: #38383c;
+
+  clip-path: polygon(
+    0 14%,
+    50% 0,
+    100% 14%,
+    100% 100%,
+    0 88%
+  );
+
+  pointer-events: none;
+}
+
+/*
+ * Główna ciemna powierzchnia.
+ * Górna krawędź tworzy "dach";
+ * dolna krawędź opada w prawo.
+ */
+.contact-section::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+
+  inset: 0;
+
+  background: #262525;
+
+  clip-path: polygon(
+    0 17%,
+    50% 6%,
+    100% 17%,
+    100% 100%,
+    0 86%
+  );
+
+  pointer-events: none;
+}
+
+.contact-content {
+  position: relative;
+  z-index: 3;
+
+  width: min(1040px, calc(100% - 48px));
+  max-width: 1040px;
+
+  margin-inline: auto;
+
+  padding-top: 150px;
+}
+
+/*
+ * TYTUŁ:
+ * - względem całej sekcji,
+ * - jedna linia,
+ * - mniejszy font.
+ */
+.contact-title-row {
+  display: block !important;
+
+  width: 100%;
+
+  margin: 0;
+
+  text-align: center;
+}
+
+.contact-title-row h2 {
+  display: inline-block !important;
+
+  width: auto !important;
+  max-width: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  color: #e9dfdf;
+
+  font-size: 42px !important;
+  line-height: 54px !important;
+  font-weight: 300;
+  letter-spacing: -0.8px;
+
+  white-space: nowrap;
+  text-align: center;
+}
+
+/*
+ * Mapa zostaje dokładnie w zaakceptowanym rozmiarze.
+ * Auto + 1fr usuwa dużą pustkę pomiędzy mapą i kontaktem.
+ */
+.contact-grid {
+  display: grid !important;
+  grid-template-columns: 460px minmax(0, 1fr) !important;
+  align-items: center;
+
+  column-gap: 58px !important;
+  row-gap: 0;
+
+  width: 100%;
+
+  margin-top: 54px !important;
+}
+
+.map-wrap,
+.map {
+  display: block;
+  width: 460px;
+  min-width: 0;
+}
+
+.map-wrap iframe,
+.map iframe {
+  display: block;
+
+  width: 460px !important;
+  max-width: 100%;
+  height: 406px !important;
+
+  border: 0;
+  border-radius: 10px;
+
+  box-shadow: none !important;
+}
+
+.contact-details {
+  align-self: center;
+
+  width: 100%;
+  max-width: 430px;
+
+  margin: 0;
+  padding: 0 !important;
+
+  font-style: normal;
+}
+
+.contact-line {
+  display: flex;
+  align-items: flex-start;
+
+  gap: 14px;
+
+  margin: 0;
+  padding: 10px 0;
+
+  color: #e5e5e5;
+
+  font-size: 18px;
+  line-height: 30px;
+  font-weight: 400;
+
+  text-decoration: none;
+
+  transition:
+    color 180ms ease,
+    transform 180ms ease;
+}
+
+.company-line {
+  text-transform: uppercase;
+}
+
+a.contact-line:hover {
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+.contact-icon {
+  flex: 0 0 25px;
+
+  width: 25px;
+  height: 25px;
+
+  margin-top: 2px;
+
+  color: #26c281;
+
+  transition: color 180ms ease;
+}
+
+.contact-icon svg {
+  display: block;
+
+  width: 25px;
+  height: 25px;
+
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+a.contact-line:hover .contact-icon {
+  color: #33d591;
+}
+
+.contact-note {
+  max-width: 355px;
+
+  margin: 2px 0 0;
+  padding: 0;
+
+  color: #8a8a8a;
+
+  font-size: 18px;
+  line-height: 30px;
+}
+
+/*
+ * Stopka kontynuuje szare tło spoza wielokąta.
+ */
+.site-footer {
+  position: relative;
+
+  background: #666777 !important;
+
+  padding: 10px 0 16px;
+
+  color: #4e4f5b;
+  letter-spacing: .01em;
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 980px) {
+  /* Header — bez zmian */
+  .site-header {
+    height: 380px;
+    min-height: 380px;
+  }
+
+  .site-header::before {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      50% 61%,
+      0 100%
+    );
+  }
+
+  .header-frame {
+    clip-path: polygon(
+      0 100%,
+      50% 61%,
+      100% 100%
+    );
+  }
+
+  .header-frame::before {
+    clip-path: polygon(
+      0 100%,
+      50% 68%,
+      100% 100%
+    );
+  }
+
+  .header-frame::after {
+    clip-path: polygon(
+      0 100%,
+      50% 74%,
+      100% 100%
+    );
+  }
+
+  .site-header .header-row {
+    width: min(900px, calc(100% - 40px));
+    min-height: 230px;
+  }
+
+  .site-header .brand {
+    width: 220px;
+    margin-top: 24px;
+  }
+
+  .site-header .brand img {
+    width: 220px;
+  }
+
+  .site-header .main-nav {
+    gap: 18px;
+    padding-top: 34px;
+    padding-right: 8px;
+  }
+
+  .site-header .main-nav a {
+    font-size: 18px;
+  }
+
+  /* Contact */
+  .contact-section {
+    min-height: 830px;
+  }
+
+  .contact-content {
+    width: min(900px, calc(100% - 40px));
+    padding-top: 135px;
+  }
+
+  .contact-title-row h2 {
+    font-size: 39px !important;
+    line-height: 50px !important;
+  }
+
+  .contact-grid {
+    grid-template-columns: minmax(0, 440px) minmax(0, 1fr) !important;
+
+    column-gap: 36px !important;
+
+    margin-top: 48px !important;
+  }
+
+  .map-wrap,
+  .map {
+    width: 100%;
+  }
+
+  .map-wrap iframe,
+  .map iframe {
+    width: 100% !important;
+    height: 388px !important;
+  }
+
+  .contact-line,
+  .contact-note {
+    font-size: 17px;
+    line-height: 28px;
+  }
+}
+
+/* =========================================================
+   TELEFON
+========================================================= */
+
+@media (max-width: 680px) {
+  /* Header — bez zmian */
+  .site-header {
+    height: 300px;
+    min-height: 300px;
+  }
+
+  .site-header::before {
+    clip-path: polygon(
+      0 0,
+      100% 0,
+      100% 100%,
+      50% 76%,
+      0 100%
+    );
+  }
+
+  .header-frame {
+    clip-path: polygon(
+      0 100%,
+      50% 76%,
+      100% 100%
+    );
+  }
+
+  .header-frame::before {
+    clip-path: polygon(
+      0 100%,
+      50% 81%,
+      100% 100%
+    );
+  }
+
+  .header-frame::after {
+    clip-path: polygon(
+      0 100%,
+      50% 85%,
+      100% 100%
+    );
+  }
+
+  .site-header .header-row {
+    display: block;
+    width: calc(100% - 28px);
+    min-height: 220px;
+    text-align: center;
+  }
+
+  .site-header .brand {
+    width: 205px;
+    margin: 14px auto 0;
+  }
+
+  .site-header .brand img {
+    width: 205px;
+  }
+
+  .site-header .main-nav {
+    justify-content: center;
+    gap: 20px;
+    padding-top: 4px;
+    padding-right: 0;
+  }
+
+  .site-header .main-nav a {
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .site-header .main-nav a > span {
+    font-size: 25px;
+  }
+
+  .about-section {
+    padding-top: 88px;
+    padding-bottom: 92px;
+  }
+
+  .about-copy {
+    padding-inline: 4px;
+    margin-bottom: 52px;
+
+    font-size: 23px;
+    line-height: 35px;
+
+    text-align: left;
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat strong {
+    font-size: 50px;
+    line-height: 54px;
+  }
+
+  .stat span {
+    margin-top: 15px;
+    padding-inline: 5px;
+
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  /* Contact mobile */
+  .contact-section {
+    min-height: 820px;
+    padding-bottom: 64px;
+  }
+
+  .contact-section::before {
+    clip-path: polygon(
+      0 7%,
+      50% 0,
+      100% 7%,
+      100% 100%,
+      0 94%
+    );
+  }
+
+  .contact-section::after {
+    clip-path: polygon(
+      0 9%,
+      50% 3%,
+      100% 9%,
+      100% 100%,
+      0 92%
+    );
+  }
+
+  .contact-content {
+    width: calc(100% - 28px);
+
+    padding-top: 92px;
+  }
+
+  .contact-title-row h2 {
+    font-size: 30px !important;
+    line-height: 40px !important;
+
+    white-space: nowrap;
+  }
+
+  .contact-grid {
+    display: flex !important;
+    flex-direction: column;
+
+    gap: 28px !important;
+
+    margin-top: 32px !important;
+  }
+
+  .map-wrap,
+  .map {
+    width: 100%;
+  }
+
+  .map-wrap iframe,
+  .map iframe {
+    width: min(100%, 430px) !important;
+    height: 330px !important;
+
+    margin-inline: auto;
+
+    border-radius: 8px;
+  }
+
+  .contact-details {
+    width: min(100%, 430px);
+    max-width: none;
+
+    margin-inline: auto;
+
+    padding: 0 2px !important;
+  }
+
+  .contact-line {
+    gap: 12px;
+
+    padding: 9px 0;
+
+    font-size: 16px;
+    line-height: 24px;
+  }
+
+  .contact-icon,
+  .contact-icon svg {
+    width: 23px;
+    height: 23px;
+  }
+
+  .contact-icon {
+    flex-basis: 23px;
+  }
+
+  .contact-note {
+    max-width: 100%;
+
+    margin-top: 8px;
+
+    font-size: 16px;
+    line-height: 25px;
+  }
+
+  .site-footer {
+    padding-top: 8px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header .brand,
+  .site-header .main-nav a,
+  .site-header .main-nav a > span,
+  .site-header .main-nav a::after,
+  .true-masonry .gallery-item img,
+  .gallery-masonry .gallery-item img,
+  .contact-line,
+  .contact-icon {
+    transition: none !important;
+  }
+}
