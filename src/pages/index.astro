@@ -1,11 +1,14 @@
----
+﻿---
 import Gallery from '../components/Gallery.astro';
+import PrivacyMap from '../components/PrivacyMap.astro';
+import PrivacyPolicy from '../components/PrivacyPolicy.astro';
 import Seo from '../components/Seo.astro';
 import site from '../data/site.json';
 import '../styles/global.css';
 import '../styles/polish.css';
 import '../styles/content-additions.css';
 import '../styles/menu-minimal.css';
+import '../styles/privacy.css';
 
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : `${rawBase}/`;
@@ -111,27 +114,14 @@ const typographyStyle = [
       <Gallery />
 
       <section class="contact-section" id="Kontakt">
-        <div class="contact-frame" aria-hidden="true">
-          <span class="contact-frame-back"></span>
-          <span class="contact-frame-mid"></span>
-          <span class="contact-frame-front"></span>
-        </div>
-
-        <div class="shell contact-content">
+<div class="shell contact-content">
           <div class="contact-title-row">
             <h2>Skontaktuj się z nami</h2>
           </div>
 
           <div class="contact-grid">
             <div class="map-wrap">
-              <iframe
-                title="Mapa dojazdu do Stolkor"
-                src={mapEmbed}
-                width="502"
-                height="443"
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-              ></iframe>
+              <PrivacyMap mapEmbed={mapEmbed} />
             </div>
 
             <address class="contact-details">
@@ -187,7 +177,8 @@ const typographyStyle = [
     </main>
 
     <footer class="site-footer">
-      <div class="shell">© {year} {content.copyright}</div>
+      <div class="shell">© {year} {content.copyright}<button type="button" class="privacy-policy-trigger" data-privacy-open>Polityka prywatnoĹ›ci</button></div>
     </footer>
+    <PrivacyPolicy />
   </body>
 </html>

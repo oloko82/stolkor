@@ -1,0 +1,88 @@
+﻿<dialog class="privacy-dialog" id="privacy-policy" aria-labelledby="privacy-title">
+  <div class="privacy-dialog-inner">
+    <button
+      type="button"
+      class="privacy-dialog-close"
+      data-privacy-close
+      aria-label="Zamknij politykę prywatności"
+    >
+      ×
+    </button>
+
+    <h2 id="privacy-title">Polityka prywatności</h2>
+    <p class="privacy-updated">Ostatnia aktualizacja: 12 sierpnia 2026 r.</p>
+
+    <h3>Administrator strony</h3>
+    <p>
+      Administratorem strony stolkor.pl jest P.P.U. Stolkor Aleksander Korol,
+      Przeździedza 1, 59-610 Przeździedza.
+    </p>
+
+    <h3>Dane zbierane przez stronę</h3>
+    <p>
+      Strona nie zawiera formularza kontaktowego i nie korzysta z narzędzi
+      analitycznych ani reklamowych takich jak Google Analytics, Google Tag
+      Manager czy Meta Pixel.
+    </p>
+    <p>
+      Podczas zwykłego korzystania ze strony mogą być przetwarzane standardowe
+      dane techniczne związane z dostarczeniem strony przez dostawcę hostingu,
+      np. adres IP, informacje o przeglądarce oraz czas żądania. Strona jest
+      hostowana przy użyciu GitHub Pages.
+    </p>
+
+    <h3>Google Maps</h3>
+    <p>
+      Mapa Google nie jest ładowana automatycznie. Połączenie z Google Maps
+      następuje dopiero po wybraniu przycisku „Wyświetl mapę”. Po uruchomieniu
+      mapy Google może przetwarzać dane użytkownika oraz stosować własne pliki
+      cookie lub podobne technologie zgodnie ze swoimi zasadami.
+    </p>
+
+    <p class="privacy-external-links">
+      <a
+        href="https://policies.google.com/privacy?hl=pl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Polityka prywatności Google
+      </a>
+      <span aria-hidden="true">·</span>
+      <a
+        href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Oświadczenie o prywatności GitHub
+      </a>
+    </p>
+
+    <h3>Kontakt</h3>
+    <p>
+      Kontakt ze Stolkor odbywa się za pomocą numerów telefonu podanych
+      w sekcji kontaktowej.
+    </p>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector('#privacy-policy');
+
+  document.querySelectorAll('[data-privacy-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (dialog instanceof HTMLDialogElement) dialog.showModal();
+    });
+  });
+
+  document.querySelectorAll('[data-privacy-close]').forEach((button) => {
+    button.addEventListener('click', () => {
+      if (dialog instanceof HTMLDialogElement) dialog.close();
+    });
+  });
+
+  dialog?.addEventListener('click', (event) => {
+    if (event.target === dialog && dialog instanceof HTMLDialogElement) {
+      dialog.close();
+    }
+  });
+</script>

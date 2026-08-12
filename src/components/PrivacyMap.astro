@@ -1,0 +1,40 @@
+﻿---
+interface Props {
+  mapEmbed: string;
+}
+const { mapEmbed } = Astro.props;
+---
+
+<div class="privacy-map" data-privacy-map>
+  <div class="privacy-map-placeholder">
+    <svg class="privacy-map-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z"></path>
+      <circle cx="12" cy="10" r="2.2"></circle>
+    </svg>
+    <strong>Mapa Google</strong>
+    <p>Mapa jest ładowana dopiero po Twoim kliknięciu.</p>
+    <button type="button" class="privacy-map-button" data-load-map data-map-src={mapEmbed}>
+      Wyświetl mapę
+    </button>
+    <small>Wyświetlenie mapy powoduje połączenie z usługą Google Maps.</small>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('[data-load-map]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const host = button.closest('[data-privacy-map]');
+      const src = button.getAttribute('data-map-src');
+      if (!host || !src) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.title = 'Mapa dojazdu do Stolkor';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.allowFullscreen = true;
+      iframe.src = src;
+      host.replaceChildren(iframe);
+    }, { once: true });
+  });
+</script>
+
