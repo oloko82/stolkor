@@ -80,7 +80,16 @@ const typographyStyle = [
     <header class="site-header">
       <div class="shell header-row">
         <a class="brand" href="#Start" aria-label="Stolkor – początek strony">
-          <img src={`${base}images/logo.webp`} alt="Stolkor" width="240" />
+          <img
+          src={`${base}images/logo-480.webp`}
+          srcset={`${base}images/logo-480.webp 480w, ${base}images/logo-960.webp 960w`}
+          sizes="240px"
+          alt="Stolkor"
+          width="240"
+          height="196"
+          fetchpriority="high"
+          decoding="async"
+        />
         </a>
 
         <nav class="main-nav" aria-label="Główna nawigacja">
