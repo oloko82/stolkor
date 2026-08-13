@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
+﻿400;500;700&display=swap');
 
 :root {
   --header:#E5E5E5; --body:#FFFFFF; --text:#666777; --heading:#1B1C20;
@@ -6,7 +6,7 @@
   --shell:min(1140px, calc(100% - 40px));
 }
 *{box-sizing:border-box} html{scroll-behavior:smooth}
-body{margin:0;background:var(--body);color:var(--text);font-family:Inter,Arial,sans-serif;font-size:18px;line-height:30px;font-weight:400;overflow-x:hidden}
+body{margin:0;background:var(--body);color:var(--text);font-family:"Inter Variable",Inter,Arial,sans-serif;font-size:18px;line-height:30px;font-weight:400;overflow-x:hidden}
 img{display:block;max-width:100%} a{color:inherit} button{font:inherit}.shell{width:var(--shell);margin-inline:auto}
 
 .site-header{position:relative;min-height:355px;background:var(--header)}
