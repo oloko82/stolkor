@@ -1,4 +1,4 @@
----
+﻿---
 import gallery from '../data/gallery.json';
 import optimized from '../data/gallery-optimized.json';
 
@@ -53,7 +53,8 @@ const items = gallery.images.map((item, index) => {
             width={item.width}
             height={item.height}
             alt={item.alt}
-            loading={item.index > 5 ? 'lazy' : 'eager'}
+            loading="lazy"
+            fetchpriority="low"
             decoding="async"
           />
         </button>
