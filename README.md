@@ -1,38 +1,112 @@
-# Stolkor
+﻿# Stolkor
 
-Jednostronicowa strona firmowa z galerią, zbudowana w Astro i edytowana przez Pages CMS.
+Strona firmowa **Stolkor** dostępna pod:
 
-## Wymagania
+https://stolkor.pl
 
-- Node.js 22 lub nowszy
-- npm
+Jednostronicowy serwis zbudowany w Astro, z galerią realizacji i edycją treści przez Pages CMS.
+
+## Technologia
+
+- Astro
+- GitHub Pages
+- Pages CMS
+- GitHub Actions
+- Sharp do optymalizacji galerii
 
 ## Uruchomienie lokalne
 
-```bash
-npm install
+```powershell
+npm ci
 npm run dev
 ```
 
-Strona będzie dostępna pod `http://localhost:4321`.
+Strona lokalna jest dostępna pod:
 
-## Wgranie do repozytorium
+```text
+http://localhost:4321/
+```
 
-```bash
+## Build
+
+```powershell
+npm run build
+```
+
+Przed buildem automatycznie uruchamia się optymalizacja galerii.
+
+## Galeria
+
+Źródłowe zdjęcia znajdują się w:
+
+```text
+public/images/gallery/
+```
+
+Dane galerii:
+
+```text
+src/data/gallery.json
+```
+
+Optymalizacja obrazów:
+
+```powershell
+npm run optimize:gallery
+```
+
+Skrypt:
+
+```text
+scripts/optimize-gallery.mjs
+```
+
+generuje responsywne warianty WebP. Niezmienione zdjęcia są pomijane.
+
+## Pages CMS
+
+Treść strony i galerię można edytować przez Pages CMS.
+
+Zmiany zapisane w Pages CMS trafiają do repozytorium GitHub.
+
+Publikacja strony jest uruchamiana ręcznie przyciskiem:
+
+**Publikuj stronę**
+
+## Publikacja
+
+Workflow:
+
+```text
+.github/workflows/deploy.yml
+```
+
+Publikacja działa przez `workflow_dispatch`, więc zwykły push nie wdraża automatycznie strony.
+
+Po zmianach:
+
+```powershell
 git add .
-git commit -m "Pierwsza wersja strony Astro"
+git commit -m "Opis zmian"
+git pull --rebase origin main
 git push origin main
 ```
 
-Następnie w GitHub: **Settings → Pages → Source → GitHub Actions**.
+Następnie uruchom **Publikuj stronę** w Pages CMS lub workflow ręcznie w GitHub Actions.
 
-## Edycja galerii
+## Ważne pliki
 
-1. Zaloguj się na `app.pagescms.org` kontem GitHub.
-2. Zainstaluj aplikację Pages CMS dla repozytorium `oloko82/stolkor`.
-3. Otwórz sekcję **Galeria**.
-4. Zamień pliki zastępcze na własne zdjęcia, ustaw opisy i zapisz.
+```text
+.pages.yml                         konfiguracja Pages CMS
+astro.config.mjs                  konfiguracja Astro / domeny / sitemap
+src/data/site.json                treść strony
+src/data/gallery.json             lista zdjęć galerii
+scripts/optimize-gallery.mjs      optymalizacja zdjęć
+.github/workflows/deploy.yml      build i publikacja GitHub Pages
+```
 
 ## Domena
 
-Domenę `stolkor.pl` podłączymy po uruchomieniu wersji testowej na GitHub Pages.
+Produkcja:
+
+https://stolkor.pl
