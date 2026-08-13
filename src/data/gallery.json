@@ -1,88 +1,88 @@
 {
-  "images": [
-    {
-      "src": "/images/gallery/realizacja-01.jpeg",
-      "alt": "Stół z drewna orzecha włoskiego i czarnej żywicy epoksydowej"
-    },
-    {
-      "src": "/images/gallery/c23aa5b2-eb0c-49ee-9e0d-041b24156aa8.jpeg",
-      "alt": "Eskluzywna zabudowa kuchenna"
-    },
-    {
-      "src": "/images/gallery/b4c94f97-5976-45be-9eb1-21e1f501c2ee.jpeg",
-      "alt": "Witryna kuchenna w wykończona w czarnym połysku"
-    },
-    {
-      "src": "/images/gallery/IMG_3486.jpeg",
-      "alt": "Bufet z drewna dębowego i forniru"
-    },
-    {
-      "src": "/images/gallery/realizacja-02.jpeg",
-      "alt": "Stylowe meble biurowe"
-    },
-    {
-      "src": "/images/gallery/realizacja-03.jpeg",
-      "alt": "Biurko dębowe szczotkowane"
-    },
-    {
-      "src": "/images/gallery/realizacja-05.jpeg",
-      "alt": "Stół z miejscem na klocki"
-    },
-    {
-      "src": "/images/gallery/realizacja-06.jpeg",
-      "alt": "Kuchnia w białym połyski i drewnianymi akcentami "
-    },
-    {
-      "src": "/images/gallery/realizacja-07.jpeg",
-      "alt": "Kuchnia w szarościach"
-    },
-    {
-      "src": "/images/gallery/realizacja-09.jpeg",
-      "alt": "Drzwi drewniane"
-    },
-    {
-      "src": "/images/gallery/realizacja-10.jpeg",
-      "alt": "Zabudowa łazienkowa pod skosem"
-    },
-    {
-      "src": "/images/gallery/realizacja-11.jpeg",
-      "alt": "Szafka łazienkowa lakierowana"
-    },
-    {
-      "src": "/images/gallery/realizacja-12.jpeg",
-      "alt": "Mała elagancka kuchnia"
-    },
-    {
-      "src": "/images/gallery/realizacja-14.jpeg",
-      "alt": "Stolik kawowy z żywicą epoksydową"
-    },
-    {
-      "src": "/images/gallery/realizacja-15.jpeg",
-      "alt": "nietypowy stolik kawowy"
-    },
-    {
-      "src": "/images/gallery/realizacja-16.jpeg",
-      "alt": "Duży stół dębowy w czarnym kolorze"
-    },
-    {
-      "src": "/images/gallery/realizacja-18.jpeg",
-      "alt": "Kuchnia "
-    },
-    {
-      "src": "/images/gallery/realizacja-19.jpeg",
-      "alt": "Dwuskrzydłowe drzwi drewniane"
-    },
-    {
-      "src": "/images/gallery/realizacja-21.jpeg",
-      "alt": "Drzwi drewniane"
-    },
-    {
-      "src": "/images/gallery/realizacja-23.jpeg",
-      "alt": "Dwuskrzydłowe drzwi drewniane w kolorze zielonym butelkowym"
-    },
-    {
-      "src": "/images/gallery/realizacja-25.jpeg",
-      "alt": "Dość duża zabudowa kuchenna, połączenia bieli i drewna"
-    }
-  ]
+    "images":  [
+                   {
+                       "src":  "/images/gallery/realizacja-01.jpeg",
+                       "alt":  "Stół z drewna orzecha włoskiego z czarną żywicą epoksydową"
+                   },
+                   {
+                       "src":  "/images/gallery/c23aa5b2-eb0c-49ee-9e0d-041b24156aa8.jpeg",
+                       "alt":  "Ekskluzywna zabudowa kuchenna na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/b4c94f97-5976-45be-9eb1-21e1f501c2ee.jpeg",
+                       "alt":  "Witryna kuchenna wykończona w czarnym połysku"
+                   },
+                   {
+                       "src":  "/images/gallery/IMG_3486.jpeg",
+                       "alt":  "Bufet z drewna dębowego i forniru"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-02.jpeg",
+                       "alt":  "Meble biurowe wykonane na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-03.jpeg",
+                       "alt":  "Szczotkowane biurko dębowe"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-05.jpeg",
+                       "alt":  "Stół z wbudowanym miejscem na klocki"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-06.jpeg",
+                       "alt":  "Kuchnia w białym połysku z drewnianymi akcentami"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-07.jpeg",
+                       "alt":  "Kuchnia na wymiar w odcieniach szarości"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-09.jpeg",
+                       "alt":  "Drzwi drewniane wykonane na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-10.jpeg",
+                       "alt":  "Zabudowa łazienkowa na wymiar pod skosem"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-11.jpeg",
+                       "alt":  "Lakierowana szafka łazienkowa na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-12.jpeg",
+                       "alt":  "Mała elegancka kuchnia na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-14.jpeg",
+                       "alt":  "Stolik kawowy z żywicą epoksydową"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-15.jpeg",
+                       "alt":  "Nietypowy stolik kawowy wykonany na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-16.jpeg",
+                       "alt":  "Duży czarny stół dębowy"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-18.jpeg",
+                       "alt":  "Kuchnia na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-19.jpeg",
+                       "alt":  "Dwuskrzydłowe drzwi drewniane wykonane na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-21.jpeg",
+                       "alt":  "Drzwi drewniane wykonane na wymiar"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-23.jpeg",
+                       "alt":  "Dwuskrzydłowe drzwi drewniane w kolorze butelkowej zieleni"
+                   },
+                   {
+                       "src":  "/images/gallery/realizacja-25.jpeg",
+                       "alt":  "Duża zabudowa kuchenna na wymiar w bieli i drewnie"
+                   }
+               ]
 }
