@@ -3,150 +3,166 @@ import path from 'node:path';
 import crypto from 'node:crypto';
 import sharp from 'sharp';
 
-const projectRoot = process.cwd();
-const galleryJsonPath = path.join(projectRoot, 'src', 'data', 'gallery.json');
-const manifestPath = path.join(projectRoot, 'src', 'data', 'gallery-optimized.json');
-const publicDir = path.join(projectRoot, 'public');
+const root = process.cwd();
+const publicDir = path.join(root, 'public');
+const galleryJson = path.join(root, 'src', 'data', 'gallery.json');
+const manifestJson = path.join(root, 'src', 'data', 'gallery-optimized.json');
 const outputDir = path.join(publicDir, 'images', 'gallery-optimized');
 
-const widths = [480, 960, 1600];
-const webpQuality = {
-  480: 78,
-  960: 80,
-  1600: 82,
-};
+const variants = [
+  { target: 480, quality: 78 },
+  { target: 960, quality: 80 },
+  { target: 1600, quality: 82 },
+];
 
-function publicPathToFile(src) {
+function sourceFile(src) {
   const clean = src.split('?')[0].split('#')[0].replace(/^\/+/, '');
   return path.join(publicDir, ...clean.split('/'));
 }
 
-function normalizedStem(src) {
-  const fileName = decodeURIComponent(src.split('/').pop() || 'image');
-  const stem = fileName.replace(/\.[^.]+$/, '');
+function safeName(src) {
+  const file = decodeURIComponent(src.split('/').pop() || 'image');
+  const stem = file.replace(/\.[^.]+$/, '');
 
   return (
     stem
       .normalize('NFKD')
       .replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-zA-Z0-9._-]+/g, '-')
+      .replace(/[^a-zA-Z0-9_-]+/g, '-')
       .replace(/^-+|-+$/g, '') || 'image'
   );
 }
 
-async function exists(filePath) {
+async function fileExists(file) {
   try {
-    await fs.access(filePath);
+    await fs.access(file);
     return true;
   } catch {
     return false;
   }
 }
 
-async function fileHash(filePath) {
-  const data = await fs.readFile(filePath);
-  return crypto.createHash('sha1').update(data).digest('hex').slice(0, 12);
+async function contentHash(input) {
+  const bytes = await fs.readFile(input);
+  return {
+    bytes,
+    hash: crypto.createHash('sha1').update(bytes).digest('hex').slice(0, 10),
+  };
 }
 
 async function readPreviousManifest() {
   try {
-    const raw = await fs.readFile(manifestPath, 'utf8');
+    const raw = await fs.readFile(manifestJson, 'utf8');
     const parsed = JSON.parse(raw);
-    return parsed?.images && typeof parsed.images === 'object'
-      ? parsed
-      : { images: {} };
-  } catch {
-    return { images: {} };
-  }
+
+    if (parsed?.images && typeof parsed.images === 'object') {
+      return parsed;
+    }
+  } catch {}
+
+  return { images: {} };
 }
 
-function generatedPaths(stem) {
-  const result = {};
-
-  for (const width of widths) {
-    const fileName = `${stem}-${width}.webp`;
-    result[String(width)] = {
-      fileName,
-      publicPath: `/images/gallery-optimized/${fileName}`,
-      outputPath: path.join(outputDir, fileName),
-    };
-  }
-
-  return result;
+function outputFileFromPublicSrc(src) {
+  return path.join(publicDir, ...src.replace(/^\/+/, '').split('/'));
 }
 
-async function canReuse(previous, sourceHash, paths) {
-  if (!previous || previous.sourceHash !== sourceHash) return false;
+async function previousCanBeReused(previous, hash) {
+  if (!previous || previous.sourceHash !== hash) return false;
+  if (!Array.isArray(previous.sources) || previous.sources.length === 0) return false;
+  if (!previous.fallback || !previous.originalWidth || !previous.originalHeight) return false;
 
-  for (const width of widths) {
-    if (!(await exists(paths[String(width)].outputPath))) return false;
+  for (const source of previous.sources) {
+    if (!source?.src || !source?.width || !source?.height) return false;
+    if (!(await fileExists(outputFileFromPublicSrc(source.src)))) return false;
   }
 
-  return Boolean(previous.width && previous.height && previous.sources);
+  return true;
 }
 
-async function optimizeOne(src, previous) {
-  const inputPath = publicPathToFile(src);
+async function optimize(src, previous) {
+  const input = sourceFile(src);
 
-  if (!(await exists(inputPath))) {
-    throw new Error(`Brak pliku galerii: ${src}\nOczekiwano: ${inputPath}`);
+  if (!(await fileExists(input))) {
+    throw new Error(`Nie znaleziono zdjęcia: ${src}\nPlik: ${input}`);
   }
 
-  const sourceHash = await fileHash(inputPath);
-  const stem = `${normalizedStem(src)}-${sourceHash}`;
-  const paths = generatedPaths(stem);
+  const { bytes, hash } = await contentHash(input);
 
-  if (await canReuse(previous, sourceHash, paths)) {
+  if (await previousCanBeReused(previous, hash)) {
     return {
       reused: true,
       data: previous,
-      expectedFiles: widths.map((width) => paths[String(width)].fileName),
     };
   }
 
-  const generated = {};
-  let displayWidth = 0;
-  let displayHeight = 0;
+  const originalMeta = await sharp(bytes, { failOn: 'none' })
+    .rotate()
+    .metadata();
 
-  for (const width of widths) {
-    const target = paths[String(width)];
+  const originalWidth = originalMeta.width || 1;
+  const originalHeight = originalMeta.height || 1;
 
-    const info = await sharp(inputPath)
+  const sources = [];
+  const seenWidths = new Set();
+
+  for (const variant of variants) {
+    const outputName = `${safeName(src)}-${hash}-${variant.target}.webp`;
+    const outputFile = path.join(outputDir, outputName);
+
+    const info = await sharp(bytes, { failOn: 'none' })
       .rotate()
       .resize({
-        width,
+        width: variant.target,
         withoutEnlargement: true,
         fit: 'inside',
       })
       .webp({
-        quality: webpQuality[width],
+        quality: variant.quality,
         effort: 4,
         smartSubsample: true,
       })
-      .toFile(target.outputPath);
+      .toFile(outputFile);
 
-    generated[String(width)] = target.publicPath;
+    // Nie dodawaj identycznych szerokości kilka razy dla małych źródeł.
+    if (!seenWidths.has(info.width)) {
+      seenWidths.add(info.width);
 
-    if (width === 1600) {
-      displayWidth = info.width;
-      displayHeight = info.height;
+      sources.push({
+        width: info.width,
+        height: info.height,
+        src: `/images/gallery-optimized/${outputName}`,
+      });
     }
   }
+
+  sources.sort((a, b) => a.width - b.width);
 
   return {
     reused: false,
     data: {
-      sourceHash,
-      width: displayWidth,
-      height: displayHeight,
-      sources: generated,
+      // Dodatkowe pole dla incremental cache.
+      // Gallery.astro je ignoruje, więc zachowujemy pełną kompatybilność.
+      sourceHash: hash,
+      originalWidth,
+      originalHeight,
+      ratio: originalHeight / originalWidth,
+      sources,
+      fallback: sources.at(-1)?.src ?? src,
     },
-    expectedFiles: widths.map((width) => paths[String(width)].fileName),
   };
 }
 
-async function removeStaleFiles(expectedFiles) {
-  const expected = new Set(expectedFiles);
+async function removeStaleFiles(manifest) {
+  const expected = new Set();
+
+  for (const item of Object.values(manifest.images)) {
+    for (const source of item.sources ?? []) {
+      if (source?.src) {
+        expected.add(path.basename(source.src));
+      }
+    }
+  }
 
   let entries = [];
   try {
@@ -155,63 +171,57 @@ async function removeStaleFiles(expectedFiles) {
     return;
   }
 
-  await Promise.all(
-    entries
-      .filter((entry) => entry.isFile() && !expected.has(entry.name))
-      .map((entry) => fs.rm(path.join(outputDir, entry.name), { force: true })),
-  );
+  for (const entry of entries) {
+    if (entry.isFile() && !expected.has(entry.name)) {
+      await fs.rm(path.join(outputDir, entry.name), { force: true });
+    }
+  }
 }
 
 async function main() {
-  const gallery = JSON.parse(await fs.readFile(galleryJsonPath, 'utf8'));
+  const gallery = JSON.parse(await fs.readFile(galleryJson, 'utf8'));
 
   if (!Array.isArray(gallery.images)) {
-    throw new Error('src/data/gallery.json nie zawiera tablicy "images".');
+    throw new Error('gallery.json nie zawiera tablicy "images".');
   }
 
   await fs.mkdir(outputDir, { recursive: true });
 
   const previousManifest = await readPreviousManifest();
   const manifest = { images: {} };
-  const expectedFiles = [];
 
   let reused = 0;
   let optimized = 0;
 
   console.log(`Galeria: ${gallery.images.length} zdjęć`);
 
-  for (let index = 0; index < gallery.images.length; index++) {
-    const item = gallery.images[index];
+  for (let i = 0; i < gallery.images.length; i++) {
+    const item = gallery.images[i];
 
     if (!item?.src) {
-      throw new Error(`Brak pola "src" dla zdjęcia nr ${index + 1}.`);
+      throw new Error(`Brak "src" przy zdjęciu nr ${i + 1}.`);
     }
 
-    const result = await optimizeOne(
+    const result = await optimize(
       item.src,
-      previousManifest.images[item.src],
+      previousManifest.images?.[item.src],
     );
 
     manifest.images[item.src] = result.data;
-    expectedFiles.push(...result.expectedFiles);
 
     if (result.reused) {
       reused++;
-      console.log(
-        `[${index + 1}/${gallery.images.length}] POMINIĘTO (bez zmian): ${item.src}`,
-      );
+      console.log(`[${i + 1}/${gallery.images.length}] POMINIĘTO: ${item.src}`);
     } else {
       optimized++;
-      console.log(
-        `[${index + 1}/${gallery.images.length}] OPTYMALIZACJA: ${item.src}`,
-      );
+      console.log(`[${i + 1}/${gallery.images.length}] OPTYMALIZACJA: ${item.src}`);
     }
   }
 
-  await removeStaleFiles(expectedFiles);
+  await removeStaleFiles(manifest);
 
   await fs.writeFile(
-    manifestPath,
+    manifestJson,
     `${JSON.stringify(manifest, null, 2)}\n`,
     'utf8',
   );
@@ -225,8 +235,6 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error('');
-  console.error('Błąd optymalizacji obrazów:');
   console.error(error);
   process.exit(1);
 });
