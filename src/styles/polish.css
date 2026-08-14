@@ -100,7 +100,7 @@ button:focus-visible {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 24px;
+  gap: 34px;
   padding-top: 40px;
   padding-right: 22px;
 }
@@ -109,34 +109,23 @@ button:focus-visible {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0;
   margin: 0;
   padding: 0;
   color: #211919;
   font-size: var(--font-menu, 20px);
   line-height: 1.4;
-  font-weight: 400;
+  font-weight: 500;
   text-decoration: none;
   transition: color 180ms ease;
-}
-
-.site-header .main-nav a > span {
-  position: relative;
-  top: -1px;
-  display: inline-block;
-  color: #211919;
-  font-size: 31px;
-  line-height: 20px;
-  font-weight: 300;
-  transition: color 180ms ease, transform 180ms ease;
 }
 
 .site-header .main-nav a::after {
   content: "";
   position: absolute;
-  left: 24px;
+  left: 0;
   right: 0;
-  bottom: -4px;
+  bottom: -5px;
   height: 1px;
   background: #26c281;
   transform: scaleX(0);
@@ -146,11 +135,6 @@ button:focus-visible {
 
 .site-header .main-nav a:hover::after {
   transform: scaleX(1);
-}
-
-.site-header .main-nav a:hover > span {
-  color: #26c281;
-  transform: translateX(2px);
 }
 
 /* ABOUT */
@@ -169,6 +153,16 @@ button:focus-visible {
 
 .about-copy p {
   margin: 0;
+}
+
+.about-copy .services-line {
+  margin-top: 32px;
+  margin-bottom: 0;
+  color: #6b6c75;
+  font-size: var(--font-services, 16px);
+  line-height: 1.6;
+  font-weight: 500;
+  letter-spacing: .025em;
 }
 
 .stat {
@@ -320,6 +314,10 @@ button:focus-visible {
   text-transform: uppercase;
 }
 
+.address-line {
+  cursor: pointer;
+}
+
 a.contact-line:hover {
   color: #fff;
   transform: translateX(3px);
@@ -407,7 +405,7 @@ a.contact-line:hover .contact-icon {
   }
 
   .site-header .main-nav {
-    gap: 18px;
+    gap: 30px;
     padding-top: 34px;
     padding-right: 8px;
   }
@@ -494,7 +492,7 @@ a.contact-line:hover .contact-icon {
 
   .site-header .main-nav {
     justify-content: center;
-    gap: 20px;
+    gap: 26px;
     padding-top: 4px;
     padding-right: 0;
   }
@@ -503,11 +501,6 @@ a.contact-line:hover .contact-icon {
     font-size: min(var(--font-menu, 20px), 16px);
     line-height: 24px;
   }
-
-  .site-header .main-nav a > span {
-    font-size: 25px;
-  }
-
   .about-section {
     padding-top: 88px;
     padding-bottom: 92px;
@@ -619,10 +612,17 @@ a.contact-line:hover .contact-icon {
   }
 }
 
+@media (max-width: 680px) {
+  .about-copy .services-line {
+    margin-top: 24px;
+    font-size: min(var(--font-services, 16px), 14px);
+    line-height: 1.55;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .site-header .brand,
   .site-header .main-nav a,
-  .site-header .main-nav a > span,
   .site-header .main-nav a::after,
   .true-masonry .gallery-item img,
   .contact-line,

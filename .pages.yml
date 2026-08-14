@@ -49,12 +49,12 @@ content:
       - name: fontMenu
         label: "Rozmiar menu (px)"
         type: string
-        default: "24"
+        default: "20"
 
       - name: fontAbout
         label: "Rozmiar tekstu o firmie (px)"
         type: string
-        default: "21"
+        default: "30"
 
       - name: fontServices
         label: "Rozmiar krótkiej listy usług (px)"
@@ -62,7 +62,7 @@ content:
         default: "16"
 
       - name: fontStats
-        label: "Rozmiar dużych liczb 10+ / 657+ (px)"
+        label: "Rozmiar dużych liczb statystyk (px)"
         type: string
         default: "68"
 

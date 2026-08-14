@@ -14,14 +14,6 @@
 body{margin:0;background:var(--body);color:var(--text);font-family:Inter,Arial,sans-serif;font-size:18px;line-height:30px;font-weight:400;overflow-x:hidden}
 img{display:block;max-width:100%} a{color:inherit} button{font:inherit}.shell{width:var(--shell);margin-inline:auto}
 
-.site-header{position:relative;min-height:355px;background:var(--header)}
-.header-row{min-height:270px;display:grid;grid-template-columns:1fr 1fr;align-items:start}
-.brand{display:inline-block;width:250px}.brand img{width:250px;height:auto}
-.main-nav{display:flex;justify-content:flex-end;gap:15px;padding-top:30px}
-.main-nav a{display:inline-flex;align-items:center;gap:5px;color:var(--nav);font-weight:500;text-decoration:none}
-.main-nav a span{font-size:22px;line-height:1}
-.header-frame{position:absolute;inset-inline:0;bottom:-1px;height:94px;background:#fff;clip-path:polygon(0 100%,50% 0,100% 100%)}
-
 .about-section{padding:160px 0;background:#fff}
 .about-grid{display:grid;grid-template-columns:3fr 1fr 1fr;gap:0;align-items:start}
 .about-copy{padding-right:90px}
