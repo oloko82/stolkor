@@ -1,4 +1,4 @@
-﻿
+
 html {
   scrollbar-gutter: stable;
 }
@@ -353,7 +353,7 @@ a.contact-line:hover .contact-icon {
   max-width: 355px;
   margin: 2px 0 0;
   padding: 0;
-  color: #8a8a8a;
+  color: #909090;
   font-size: var(--font-contact, 18px);
   line-height: 1.6667;
 }
@@ -362,7 +362,7 @@ a.contact-line:hover .contact-icon {
   position: relative;
   background: #666777;
   padding: 10px 0 16px;
-  color: #4e4f5b;
+  color: #f2f2f2;
   font-size: var(--font-footer, 14px);
   line-height: 1.4;
   letter-spacing: .01em;
