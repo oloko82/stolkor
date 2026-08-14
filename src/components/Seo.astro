@@ -54,10 +54,25 @@ const structuredData = {
       description: site.description,
       logo: logoUrl,
       image: ogImageUrl,
-      telephone: [
-        site.phoneFurniture,
-        site.phoneJoinery,
-      ],
+      telephone: site.phoneFurniture,
+      areaServed: {
+        '@type': 'Place',
+        name: 'Lwówek Śląski i okolice',
+      },
+      hasOfferCatalog: {
+        '@type': 'OfferCatalog',
+        name: 'Meble na wymiar Stolkor',
+        itemListElement: [
+          {
+            '@type': 'Offer',
+            itemOffered: {
+              '@type': 'Service',
+              name: 'Meble na wymiar',
+              areaServed: 'Lwówek Śląski i okolice',
+            },
+          },
+        ],
+      },
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Przeździedza 1',
