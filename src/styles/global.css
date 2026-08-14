@@ -1,4 +1,4 @@
-﻿@font-face {
+@font-face {
   font-family: "Inter";
   src: url("/fonts/InterVariable.woff2") format("woff2");
   font-style: normal;
@@ -63,4 +63,16 @@ img{display:block;max-width:100%} a{color:inherit} button{font:inherit}.shell{wi
   .about-section{padding:100px 0}.about-copy p{font-size:24px;line-height:36px}.stat strong{font-size:52px;line-height:56px}.stat span{font-size:13px;line-height:20px}
   .contact-title-row h2{font-size:36px;line-height:48px}.map-wrap iframe{height:360px}.contact-details{padding:8px}
   .contact-line,.contact-note{font-size:16px;line-height:26px}
+}
+/* Dostępne dla czytników ekranu, niewidoczne wizualnie */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
