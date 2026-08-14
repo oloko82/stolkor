@@ -53,7 +53,7 @@ async function contentHash(input) {
 async function readPreviousManifest() {
   try {
     const raw = await fs.readFile(manifestJson, 'utf8');
-    const parsed = JSON.parse(raw);
+    const parsed = JSON.parse(raw.replace(/^\uFEFF/, ''));
 
     if (parsed?.images && typeof parsed.images === 'object') {
       return parsed;
@@ -179,7 +179,8 @@ async function removeStaleFiles(manifest) {
 }
 
 async function main() {
-  const gallery = JSON.parse(await fs.readFile(galleryJson, 'utf8'));
+  const galleryRaw = await fs.readFile(galleryJson, 'utf8');
+  const gallery = JSON.parse(galleryRaw.replace(/^\uFEFF/, ''));
 
   if (!Array.isArray(gallery.images)) {
     throw new Error('gallery.json nie zawiera tablicy "images".');
